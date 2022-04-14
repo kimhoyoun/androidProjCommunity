@@ -113,7 +113,6 @@ public class DetailActivity extends AppCompatActivity {
 
 
 
-
         btnNewComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

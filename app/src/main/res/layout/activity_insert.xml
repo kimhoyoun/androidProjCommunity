@@ -13,47 +13,106 @@
         android:layout_marginLeft="1dp">
 
     </androidx.appcompat.widget.Toolbar>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/insertToolbar"
-        android:layout_above="@+id/insertBottomLayout">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:layout_margin="10dp"
-        android:orientation="vertical">
+        android:layout_above="@+id/insertBottomLayout"
+        android:layout_below="@+id/insertToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="5dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:textSize="20dp"
-            android:layout_gravity="center"/>
-        <EditText
-            android:id="@+id/newTitle"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="10dp"
-            android:hint="제목을 입력해주세요"
-            android:inputType="text"/>
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:text="FeedType  "
+                    android:textSize="20dp" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radioFood"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="30dp"
+                        android:text="Food"
+                        android:checked="true"/>
+
+                    <RadioButton
+                        android:id="@+id/radioExercise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Exercise" />
+
+
+                </RadioGroup>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Title"
+                    android:textSize="20dp" />
+
+                <EditText
+                    android:id="@+id/newTitle"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:hint="제목을 입력해주세요"
+                    android:inputType="text" />
+
+            </LinearLayout>
+
+            <GridView
+                android:id="@+id/photoGridView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="4">
+
+            </GridView>
+
+            <EditText
+                android:id="@+id/newMainText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:hint="본문을 입력해주세요." />
+
+
+            <ImageView
+                android:id="@+id/testImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
-        <EditText
-            android:id="@+id/newMainText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:hint="본문을 입력해주세요."/>
-
-    </LinearLayout>
     </ScrollView>
 
     <LinearLayout

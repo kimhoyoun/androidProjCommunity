@@ -5,18 +5,20 @@ import java.io.Serializable;
 public class FeedDTO implements Serializable, Comparable<FeedDTO> {
     private int no;
     private String userID;
+    private String userName;
     private String title;
     private String mainText;
     private int feedType;
     private String date;
 
     public FeedDTO(){
-        this(0,null,null,null,1,null);
+        this(0,null,null,null,null,1,null);
     }
 
-    public FeedDTO(int no, String userID, String title, String mainText, int feedType, String date){
+    public FeedDTO(int no, String userID, String userName, String title, String mainText, int feedType, String date){
         this.no = no;
         this.userID = userID;
+        this.userName = userName;
         this.title = title;
         this.mainText = mainText;
         this.feedType = feedType;
@@ -37,6 +39,14 @@ public class FeedDTO implements Serializable, Comparable<FeedDTO> {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getTitle() {
@@ -78,6 +88,7 @@ public class FeedDTO implements Serializable, Comparable<FeedDTO> {
         return "CommunityItemDTO{" +
                 "no=" + no +
                 ", userID='" + userID + '\'' +
+                ", userName='" + userName + '\'' +
                 ", title='" + title + '\'' +
                 ", mainText='" + mainText + '\'' +
                 ", feedType=" + feedType +

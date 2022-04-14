@@ -12,8 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.andprojcommunity.DetailActivity;
+import com.example.andprojcommunity.MainActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.model.FeedDTO;
+import com.example.andprojcommunity.model.UserAccount;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -50,8 +52,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         if(getItemCount()!= 0) {
             FeedDTO dto = itemList.get(position);
             holder.title.setText(dto.getTitle());
-            holder.userid.setText(dto.getUserID());
+            holder.userNameText.setText(dto.getUserName());
             holder.feedTime.setText(holder.dateForm(dto.getDate()));
+            if(dto.getFeedType() == 2){
+                holder.feedType.setText("Exercise");
+            }else {
+                holder.feedType.setText("Food");
+            }
         }
     }
 
@@ -68,17 +75,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     class FeedViewHolder extends RecyclerView.ViewHolder {
 
         public TextView title;
-        public TextView userid;
+        public TextView userNameText;
         public TextView feedTime;
-
+        public TextView feedType;
 
         public FeedViewHolder(Context context, @NonNull View itemView, ArrayList<FeedDTO> itemList) {
             super(itemView);
 
             title = itemView.findViewById(R.id.titleText);
-            userid = itemView.findViewById(R.id.useridText);
+            userNameText = itemView.findViewById(R.id.userNameText);
             feedTime = itemView.findViewById(R.id.dateText);
-
+            feedType = itemView.findViewById(R.id.feedTypeText);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -90,12 +97,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                         intent.putExtra("dto",itemList.get(pos));
                         context.startActivity(intent);
                     }
+
                 }
+
             });
         }
 
         public String dateForm(String date){
-            long mNow = System.currentTimeMillis();
+            long mNow = new Date().getTime();
             Date format = null;
             String result = "방금 전";
 

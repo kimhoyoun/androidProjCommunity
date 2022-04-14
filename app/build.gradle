@@ -29,6 +29,10 @@ android {
 }
 
 dependencies {
+
+    implementation 'io.github.ParkSangGwon:tedpermission-rx3:3.3.0'
+
+
     implementation platform('com.google.firebase:firebase-bom:29.3.0')
     implementation 'com.google.firebase:firebase-analytics'
 

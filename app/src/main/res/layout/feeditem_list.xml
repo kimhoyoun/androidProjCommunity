@@ -8,9 +8,25 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/feedTypeText"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Food"
+        android:padding="3dp"
+        android:layout_gravity="center"
+        android:background="#e3e3e3"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="5dp">
+        android:layout_marginLeft="5dp"
+        android:padding="3dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -18,12 +34,15 @@
             android:src="@drawable/profile"/>
 
         <TextView
-            android:id="@+id/useridText"
+            android:id="@+id/userNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="user"
+            android:text="userName"
             android:layout_marginLeft="5dp"
             android:layout_gravity="center"/>
+
+
+
     </LinearLayout>
 
     <TextView
@@ -49,15 +68,11 @@
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/heart"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/comment"/>
+<!--        <ImageView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:src="@drawable/comment"/>-->
 
     </LinearLayout>
 

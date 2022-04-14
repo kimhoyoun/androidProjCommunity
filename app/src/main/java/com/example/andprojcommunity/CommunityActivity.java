@@ -12,6 +12,7 @@ import com.example.andprojcommunity.fragment.FeedFragment;
 import com.example.andprojcommunity.fragment.MyPageFragment;
 import com.example.andprojcommunity.fragment.SearchFragment;
 import com.example.andprojcommunity.model.FeedDTO;
+import com.example.andprojcommunity.model.UserAccount;
 import com.google.android.material.tabs.TabLayout;
 
 public class CommunityActivity extends AppCompatActivity{
@@ -35,6 +36,14 @@ public class CommunityActivity extends AppCompatActivity{
         fragment1 = new SearchFragment(CommunityActivity.this);
         fragment2 = new MyPageFragment(CommunityActivity.this);
 
+        UserAccount user = MainActivity.getUserInstance();
+        System.out.println("user : " +user);
+        System.out.println("userInstance : " +MainActivity.getUserInstance());
+
+        System.out.println();
+        user.setName("hohohohohoo");
+        System.out.println("user : " +user);
+        System.out.println("userInstance : " +MainActivity.getUserInstance());
 
         selected = fragment0;
         getSupportFragmentManager().beginTransaction().add(R.id.frame, fragment0).commit();
