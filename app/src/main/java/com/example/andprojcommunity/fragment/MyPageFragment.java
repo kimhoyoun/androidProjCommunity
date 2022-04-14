@@ -62,7 +62,7 @@ public class MyPageFragment extends Fragment{
         profileTabName = (TextView) view.findViewById(R.id.profileTabName);
 
         database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-        databaseReference = database.getReference().child("Table");
+        databaseReference = database.getReference().child("DB");
 
         recyclerView = view.findViewById(R.id.mypage_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));

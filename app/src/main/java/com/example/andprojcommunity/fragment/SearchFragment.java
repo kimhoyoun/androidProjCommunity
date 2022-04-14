@@ -61,7 +61,7 @@ public class SearchFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-        databaseReference = database.getReference().child("Table");
+        databaseReference = database.getReference().child("DB");
 
         dtoList = new ArrayList<>();
 

@@ -22,6 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.andprojcommunity.adapter.CommentAdapter;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,7 +71,7 @@ public class DetailActivity extends AppCompatActivity {
         detailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
 
         database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-        databaseReference = database.getReference().child("Table");
+        databaseReference = database.getReference().child("DB");
 
         commentList = new ArrayList<>();
 
@@ -86,9 +89,7 @@ public class DetailActivity extends AppCompatActivity {
         dateText.setText(dto.getDate().substring(0,10));
 
 
-        Query myQuery = databaseReference.orderByChild("feed_no").equalTo(dto.getNo()+"");
-
-        DatabaseReference commentRef = databaseReference.child("Table").child("Comments");
+        Query myQuery = databaseReference.child("Comments").orderByChild("feed_no").equalTo(dto.getNo());
 
         myQuery.addValueEventListener(new ValueEventListener() {
             @Override
@@ -96,7 +97,7 @@ public class DetailActivity extends AppCompatActivity {
                 commentList.clear();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     CommentDTO comment = snapshot.getValue(CommentDTO.class);
-
+                    commentList.add(comment);
                 }
                 commentAdapter.notifyDataSetChanged();
             }
@@ -111,44 +112,31 @@ public class DetailActivity extends AppCompatActivity {
         detailCommentRecyclerView.setAdapter(commentAdapter);
 
 
+
+
         btnNewComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!newCommnetText.getText().toString().equals("")){
-                    final int sequence;
 
-
-                    System.out.println(databaseReference.child("Table").child("Comments").child("Sequence").get());
-                    databaseReference.child("Table").child("Comments").child("Sequence").addListenerForSingleValueEvent(new ValueEventListener() {
+                    databaseReference.child("Comments").child("Sequence").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            long seq = (Long)snapshot.getValue();
-                            System.out.println(seq);
-                            CommentDTO comment = new CommentDTO((int)seq, "user3",newCommnetText.getText().toString(), dto.getUserID(), dto.getNo(), "2022-04-03 16:26:10");
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if(!task.isSuccessful()){
+                                System.out.println("실패");
+                            }else{
+                                long seq = (Long)task.getResult().getValue();
+                                CommentDTO comment = new CommentDTO((int)seq, "user3",newCommnetText.getText().toString(), dto.getUserID(), dto.getNo(), "2022-04-03 16:26:10");
 
-                            databaseReference.child("Table").child("Comments").child(seq+"").setValue(comment);
-                            databaseReference.child("Table").child("Comments").child("Sequence").setValue(seq +1);
+                                databaseReference.child("Comments").child(seq+"").setValue(comment);
+                                databaseReference.child("Comments").child("Sequence").setValue(seq +1);
 
-                            imm.hideSoftInputFromWindow(newCommnetText.getWindowToken(), 0);
-                            newCommnetText.setText("");
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
+                                imm.hideSoftInputFromWindow(newCommnetText.getWindowToken(), 0);
+                                newCommnetText.setText("");
+                            }
                         }
                     });
 
-
-
-//                    DatabaseReference ref = databaseReference.child("Table").child("Comments").child("4");
-//                    CommentDTO comment = new CommentDTO(3, "user3",newCommnetText.getText().toString(), dto.getUserID(), dto.getNo(), "2022-04-03 16:26:10");
-//                    ref.setValue(comment);
-//
-//                    // 키보드 내리기
-//                    imm.hideSoftInputFromWindow(newCommnetText.getWindowToken(), 0);
-//                    newCommnetText.setText("");
 
                 }else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(DetailActivity.this);
@@ -162,7 +150,6 @@ public class DetailActivity extends AppCompatActivity {
 
                     builder.show();
                 }
-
             }
             });
 
@@ -184,8 +171,10 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.detail_menuUpdate:
-//                update(dto);
-                finish();
+                    Intent intent = new Intent(DetailActivity.this, InsertActivity.class);
+                    intent.putExtra("dto",dto);
+                    startActivity(intent);
+                    finish();
                 return true;
             case R.id.detail_menuDelete:
 
@@ -195,15 +184,12 @@ public class DetailActivity extends AppCompatActivity {
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        boolean result;
-//                        result = delete(dto);
-                        Toast.makeText(DetailActivity.this, "삭제됨",Toast.LENGTH_SHORT).show();
-
-//                        if(result){
-//                            finish();
-//                        }else{
-//
-//                        }
+                        databaseReference.child("Feeds").child(dto.getNo()+"").setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                finish();
+                            }
+                        });
 
                     }
                 });
@@ -222,32 +208,4 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-//    public void update(CommunityItemDTO item){
-//        Intent intent = new Intent(DetailActivity.this, InsertActivity.class);
-//        intent.putExtra("dto",item);
-//        startActivity(intent);
-//    }
-//
-//    public boolean delete(CommunityItemDTO item){
-//        int no = item.getNo();
-//
-//        String query = "delete from communityItem where no = "+no;
-//
-//        sqlDB = myHelper.getWritableDatabase();
-//        sqlDB.execSQL(query);
-//
-//        query = "delete from comment where feed_no = "+no;
-//        sqlDB.execSQL(query);
-//
-//        sqlDB.close();
-//
-//        return true;
-//    }
-
-    public void setComment(){
-
-
-
-    }
 }

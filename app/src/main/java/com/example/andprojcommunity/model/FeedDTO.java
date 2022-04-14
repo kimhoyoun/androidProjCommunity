@@ -2,7 +2,7 @@ package com.example.andprojcommunity.model;
 
 import java.io.Serializable;
 
-public class FeedDTO implements Serializable {
+public class FeedDTO implements Serializable, Comparable<FeedDTO> {
     private int no;
     private String userID;
     private String title;
@@ -11,15 +11,15 @@ public class FeedDTO implements Serializable {
     private String date;
 
     public FeedDTO(){
-        this(0,null,null,null,0,null);
+        this(0,null,null,null,1,null);
     }
 
-    public FeedDTO(int no, String userID, String title, String mainText, int cName, String date){
+    public FeedDTO(int no, String userID, String title, String mainText, int feedType, String date){
         this.no = no;
         this.userID = userID;
         this.title = title;
         this.mainText = mainText;
-        this.feedType = cName;
+        this.feedType = feedType;
         this.date = date;
     }
 
@@ -55,12 +55,12 @@ public class FeedDTO implements Serializable {
         this.mainText = mainText;
     }
 
-    public int getcName() {
+    public int getFeedType() {
         return feedType;
     }
 
-    public void setcName(int cName) {
-        this.feedType = cName;
+    public void setFeedType(int feedType) {
+        this.feedType = feedType;
     }
 
     public String getDate() {
@@ -80,9 +80,21 @@ public class FeedDTO implements Serializable {
                 ", userID='" + userID + '\'' +
                 ", title='" + title + '\'' +
                 ", mainText='" + mainText + '\'' +
-                ", cName=" + feedType +
+                ", feedType=" + feedType +
                 ", date='" + date + '\'' +
                 '}';
+    }
+
+
+
+    @Override
+    public int compareTo(FeedDTO feed) {
+        if(feed.getNo() < no){
+            return 1;
+        }else if(feed.getNo() > no){
+            return -1;
+        }
+        return 0;
     }
 //
 //    @Override

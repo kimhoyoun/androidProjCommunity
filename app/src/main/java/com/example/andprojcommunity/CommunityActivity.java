@@ -1,8 +1,11 @@
 package com.example.andprojcommunity;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.example.andprojcommunity.fragment.FeedFragment;
@@ -23,11 +26,20 @@ public class CommunityActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.community);
 
+        Toolbar toolbar = findViewById(R.id.communityToolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Community Page");
+
         fragment0 = new FeedFragment(CommunityActivity.this);
+        fragment1 = new SearchFragment(CommunityActivity.this);
+        fragment2 = new MyPageFragment(CommunityActivity.this);
+
+
         selected = fragment0;
         getSupportFragmentManager().beginTransaction().add(R.id.frame, fragment0).commit();
 
-        tabs = (TabLayout) findViewById(R.id.tabs);
+        tabs = findViewById(R.id.tabs);
         tabs.setTabGravity(tabs.GRAVITY_FILL);
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -37,19 +49,10 @@ public class CommunityActivity extends AppCompatActivity{
 
 
                 if(position == 0){
-
-                    fragment0 = new FeedFragment(CommunityActivity.this);
-
                     selected = fragment0;
                 }else if(position == 1){
-
-                        fragment1 = new SearchFragment(CommunityActivity.this);
-
                     selected = fragment1;
                 }else if(position == 2){
-
-                        fragment2 = new MyPageFragment(CommunityActivity.this);
-
                     selected = fragment2;
                 }
 
@@ -69,40 +72,15 @@ public class CommunityActivity extends AppCompatActivity{
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(selected == fragment0){
-
-            fragment0 = new FeedFragment(CommunityActivity.this);
-
-            selected = fragment0;
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
         }
-//        else if(selected == fragment1){
-//
-//            fragment1 = new SearchFragment(CommunityActivity.this);
-//
-//            selected = fragment1;
-//        }
-//        else if(selected == fragment2){
-//
-//            fragment2 = new MyPageFragment(CommunityActivity.this);
-//
-//            selected = fragment2;
-//        }
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame, selected).commit();
-
+        return super.onOptionsItemSelected(item);
     }
 
-    public void detailPage(FeedDTO dto){
-        FeedDTO tempDTO = new FeedDTO(dto.getNo(), dto.getUserID(), dto.getTitle(), dto.getMainText(),  dto.getcName(), dto.getDate());
-
-//        Intent intent = new Intent(CommunityActivity.this, DetailActivity.class);
-//        intent.putExtra("dto",tempDTO);
-//        startActivity(intent);
-
-    }
 }
 
 

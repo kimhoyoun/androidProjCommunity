@@ -1,6 +1,7 @@
 package com.example.andprojcommunity.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.andprojcommunity.InsertActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.adapter.FeedAdapter;
 import com.example.andprojcommunity.model.FeedDTO;
@@ -62,16 +64,21 @@ public class FeedFragment extends Fragment {
         feedList = new ArrayList<>();
 
         database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-        databaseReference = database.getReference().child("Table").child("Feeds");
+        databaseReference = database.getReference().child("DB").child("Feeds");
+
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 feedList.clear();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    FeedDTO feed = snapshot.getValue(FeedDTO.class);
-                    feedList.add(feed);
+                    if(! (snapshot.getValue() instanceof Long)){
+                        FeedDTO feed = snapshot.getValue(FeedDTO.class);
+                        feedList.add(feed);
+                    }
                 }
+                Collections.sort(feedList);
+                Collections.sort(feedList,Collections.reverseOrder());
                 adapter.notifyDataSetChanged();
             }
 
@@ -88,8 +95,8 @@ public class FeedFragment extends Fragment {
         btnNewFeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getActivity(), InsertActivity.class);
-//                startActivity(intent);
+                Intent intent = new Intent(getActivity(), InsertActivity.class);
+                startActivity(intent);
             }
         });
         return view;

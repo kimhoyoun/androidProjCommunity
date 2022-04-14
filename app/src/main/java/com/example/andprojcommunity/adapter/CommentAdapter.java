@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -105,6 +106,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
             this.className = className;
 
+
+
             if(className.equals("CommunityActivity")) {
                 btnCommentMenu.setVisibility(View.INVISIBLE);
             }else{
@@ -140,7 +143,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-                                            databaseReference = database.getReference().child("Table");
+                                            databaseReference = database.getReference().child("DB");
 
                                             String newText = editComment.getText().toString();
                                             comment.setComment_text(newText);
@@ -169,7 +172,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-                                            databaseReference = database.getReference().child("Table");
+                                            databaseReference = database.getReference().child("DB");
 
                                             databaseReference.child("Comments").child(itemList.get(pos).getNo()+"").setValue(null);
                                             Toast.makeText(context, "삭제됨",Toast.LENGTH_SHORT).show();
@@ -212,7 +215,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                             // feed_no로 feed 객체 생성
 
                             database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
-                            databaseReference = database.getReference().child("Table");
+                            databaseReference = database.getReference().child("DB");
 
                             databaseReference.child("Feeds").child(feedNo).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

@@ -31,11 +31,11 @@
 
         </activity>
 
-<!--        <activity-->
-<!--            android:name=".InsertActivity"-->
-<!--            android:theme="@style/AppTheme">-->
+        <activity
+            android:name=".InsertActivity"
+            android:theme="@style/AppTheme">
 
-<!--        </activity>-->
+        </activity>
     </application>
 
 </manifest>
