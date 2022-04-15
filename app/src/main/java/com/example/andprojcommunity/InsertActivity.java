@@ -1,11 +1,15 @@
 package com.example.andprojcommunity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -30,19 +34,23 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
 import com.example.andprojcommunity.model.UserAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.gun0912.tedpermission.PermissionListener;
-//import com.gun0912.tedpermission.normal.TedPermission;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -54,10 +62,22 @@ import java.util.List;
 
 public class InsertActivity extends AppCompatActivity {
     private final int GALLERY_CODE = 10;
-    private final int FROM_CAMERA = 10;
+    private final int FROM_CAMERA = 0;
+    private final int FROM_ALBUM = 2;
+
+    final private static String Tag = "태그명";
+    final static int TAKE_PICTURE = 1;
+
+    String getmCurrentPhotoPath;
+    final static int REQUEST_TAKE_PHOTO = 1;
+
+
+    int flag;
 
     String mCurrentPhotoPath;
-    Uri imgUri;
+    Uri imgUri, photoURI, albumURI;
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     ImageView img1;
 
@@ -80,20 +100,15 @@ public class InsertActivity extends AppCompatActivity {
         setContentView(R.layout.activity_insert);
 
 
-        // TedPermission 라이브러리 -> 카메라 권한 획득
-        PermissionListener permissionListener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-                Toast.makeText(InsertActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                System.out.println("권한 설정 완료");
             }
-
-            @Override
-            public void onPermissionDenied(List<String> deniedPermissions) {
-                Toast.makeText(InsertActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            else{
+                System.out.println("권한 설정 요청");
+                ActivityCompat.requestPermissions(InsertActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},1 );
             }
-        };
-
-//        new TedPermission()
+        }
 
 
 
@@ -136,11 +151,12 @@ public class InsertActivity extends AppCompatActivity {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         if(item.getItemId() == R.id.menu_takePhoto){
-
+                            flag = 0;
                             takePhoto();
 
                         }else if(item.getItemId() == R.id.menu_Album){
-
+                            flag = 1;
+                            selectAlbum();
                         }else{
 
                         }
@@ -209,6 +225,38 @@ public class InsertActivity extends AppCompatActivity {
                            if(!task.isSuccessful()){
                                System.out.println("실패");
                            }else{
+                               final String cu = "testUserID";
+
+                               String filename = cu + "_"+System.currentTimeMillis();
+                               StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child("photo/" + filename);
+
+                               UploadTask uploadTask;
+
+                               Uri file = null;
+                               if(flag == 0){
+                                   file = Uri.fromFile(new File(mCurrentPhotoPath));
+                               }else if(flag == 1){
+                                   file = photoURI;
+                               }
+
+                               uploadTask = storageRef.putFile(file);
+//                               final ProcessDialog processDialog = new
+
+                               uploadTask.addOnFailureListener(new OnFailureListener() {
+                                   @Override
+                                   public void onFailure(@NonNull Exception e) {
+                                       System.out.println("업로드 실패");
+                                       e.printStackTrace();
+                                   }
+                               }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                   @Override
+                                   public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                       System.out.println("업로드 성공");
+                                   }
+                               });
+
+
                                long seq = (Long)task.getResult().getValue();
 
                                RadioButton rb = (RadioButton)findViewById(radioGroup.getCheckedRadioButtonId());
@@ -217,7 +265,7 @@ public class InsertActivity extends AppCompatActivity {
                                UserAccount user = MainActivity.getUserInstance();
 
                                FeedDTO feed = new FeedDTO((int)seq, user.getEmailId(), user.getName(), newTitle.getText().toString(), newMainText.getText().toString()
-                                       , feedType, currentTime());
+                                       , feedType, currentTime(), filename);
 
                                databaseReference.child("Feeds").child("Sequence").setValue(seq +1);
                                databaseReference.child("Feeds").child(seq+"").setValue(feed).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -254,6 +302,17 @@ public class InsertActivity extends AppCompatActivity {
         return getTime;
     }
 
+    // 권한 요청
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        System.out.println("onRequestPermissionResult");
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+            System.out.println("Permission : "+ permissions[0] + "was "+ grantResults[0]);
+        }
+    }
 
     public void takePhoto(){
         // 사진촬영
@@ -274,10 +333,10 @@ public class InsertActivity extends AppCompatActivity {
                 }
 
                 if(photoFile != null){
-                    Uri providerURI = FileProvider.getUriForFile(this, getPackageName(),photoFile);
+                    Uri providerURI = FileProvider.getUriForFile(this, "com.example.andprojcommunity.fileprovider",photoFile);
                     imgUri = providerURI;
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
-                    startActivityForResult(intent, FROM_CAMERA);
+                    startActivityForResult(intent, REQUEST_TAKE_PHOTO);
                 }
             }
         }else{
@@ -290,9 +349,9 @@ public class InsertActivity extends AppCompatActivity {
 
     // 이미지 생성
     public File createImageFile() throws IOException{
-        String imgFileName = System.currentTimeMillis()+".jpg";
+        String imgFileName = System.currentTimeMillis()+"";
         File imageFile = null;
-        File storageDir = new File(Environment.getExternalStorageDirectory()+"/Pictures","ireh");
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         if(!storageDir.exists()){
             // 스토리지 없으면 만듦
@@ -301,7 +360,7 @@ public class InsertActivity extends AppCompatActivity {
         }
 
         System.out.println("storage 존재함 : "+ storageDir.toString());
-        imageFile = new File(storageDir,imgFileName);
+        imageFile = File.createTempFile(imgFileName, ".jpg",storageDir);
         mCurrentPhotoPath = imageFile.getAbsolutePath();
 
         return imageFile;
@@ -313,8 +372,9 @@ public class InsertActivity extends AppCompatActivity {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
         Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
         sendBroadcast(mediaScanIntent);
-        Toast.makeText(this, "사진 저장", Toast.LENGTH_SHORT).show();
+        Toast.makeText(InsertActivity.this, "사진 저장", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -328,7 +388,7 @@ public class InsertActivity extends AppCompatActivity {
 
         intent.setType("image/*");
 
-//        startActivityForResult(intent, FROM_ALBUM);
+        startActivityForResult(intent, FROM_ALBUM);
     }
 
     // 선택 후 처리 (FROM_ALBUM, FROM_CAMERA)
@@ -342,21 +402,22 @@ public class InsertActivity extends AppCompatActivity {
             return;
         }
 
+
         switch (requestCode){
 
-//            case FROM_ALBUM:{
-//                // 앨범 가져오기
-//                if(data.getData()!= null){
-//                    try{
-//                        photoURI = data.getData();
-//                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),photoURI);
-//                        img1.setImageBitmap(bitmap);
-//                    }catch (Exception e){
-//                        e.printStackTrace();
-//                    }
-//                }
-//                break;
-//            }
+            case FROM_ALBUM:{
+                // 앨범 가져오기
+                if(data.getData()!= null){
+                    try{
+                        photoURI = data.getData();
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),photoURI);
+                        img1.setImageBitmap(bitmap);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
 
             case FROM_CAMERA:{
                // 카메라 촬영
@@ -369,8 +430,38 @@ public class InsertActivity extends AppCompatActivity {
                 }
                 break;
             }
+
+            case REQUEST_TAKE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    galleryAddPic();
+                    File file = new File(mCurrentPhotoPath);
+                    Bitmap bitmap;
+                    if(Build.VERSION.SDK_INT >= 29){
+                        ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), Uri.fromFile(file));
+                        try {
+                            bitmap = ImageDecoder.decodeBitmap(source);
+                            if(bitmap != null){
+                                img1.setImageBitmap(bitmap);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        try {
+                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.fromFile(file));
+                            if (bitmap != null) {
+                                img1.setImageBitmap(bitmap);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
         }
     }
+
+
 
     public class PhothGridView extends BaseAdapter{
         Context context;

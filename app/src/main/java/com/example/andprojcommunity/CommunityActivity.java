@@ -36,14 +36,14 @@ public class CommunityActivity extends AppCompatActivity{
         fragment1 = new SearchFragment(CommunityActivity.this);
         fragment2 = new MyPageFragment(CommunityActivity.this);
 
-        UserAccount user = MainActivity.getUserInstance();
-        System.out.println("user : " +user);
-        System.out.println("userInstance : " +MainActivity.getUserInstance());
-
-        System.out.println();
-        user.setName("hohohohohoo");
-        System.out.println("user : " +user);
-        System.out.println("userInstance : " +MainActivity.getUserInstance());
+//        UserAccount user = MainActivity.getUserInstance();
+//        System.out.println("user : " +user);
+//        System.out.println("userInstance : " +MainActivity.getUserInstance());
+//
+//        System.out.println();
+//        user.setName("hohohohohoo");
+//        System.out.println("user : " +user);
+//        System.out.println("userInstance : " +MainActivity.getUserInstance());
 
         selected = fragment0;
         getSupportFragmentManager().beginTransaction().add(R.id.frame, fragment0).commit();

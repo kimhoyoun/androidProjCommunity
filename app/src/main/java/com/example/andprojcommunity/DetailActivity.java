@@ -2,6 +2,7 @@ package com.example.andprojcommunity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.andprojcommunity.adapter.CommentAdapter;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
@@ -31,6 +34,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
@@ -43,6 +48,7 @@ public class DetailActivity extends AppCompatActivity {
 
     Button btnNewComment;
     EditText newCommnetText;
+    ImageView loadImg;
 
     ArrayList<CommentDTO> commentList;
 
@@ -66,9 +72,31 @@ public class DetailActivity extends AppCompatActivity {
 
         btnNewComment = (Button)findViewById(R.id.btnNewComment);
         newCommnetText = (EditText)findViewById(R.id.newCommnetText);
+        loadImg = findViewById(R.id.loadImg);
 
         detailCommentRecyclerView = findViewById(R.id.detailCommentRecyclerView);
         detailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        loadImg.setVisibility(View.INVISIBLE);
+
+        // 이미지 로드
+        if(dto.getImageURL()!= null){
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference().child("photo");
+            if(storageReference == null){
+                Toast.makeText(DetailActivity.this, "저장소에 사진이 없습니다.", Toast.LENGTH_SHORT).show();
+            }else{
+                StorageReference loadImageUrl = storageReference.child(dto.getImageURL());
+                System.out.println(loadImageUrl);
+                loadImageUrl.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(DetailActivity.this).load(uri).into(loadImg);
+                        loadImg.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }
 
         database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
         databaseReference = database.getReference().child("DB");

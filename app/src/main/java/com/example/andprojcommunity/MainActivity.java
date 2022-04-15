@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         ref = database.getReference().child("DB");
 
+        // key값으로 수정예정
         // idToken이 아닌 email이 들어갈듯
         ref.child("UserAccount").child("4Ugwi9DyqvWIT62prxEMrw8sJVS2").addValueEventListener(new ValueEventListener() {
             @Override
