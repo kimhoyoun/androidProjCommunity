@@ -51,8 +51,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="30dp"
-                        android:text="Food"
-                        android:checked="true"/>
+                        android:checked="true"
+                        android:text="Food" />
 
                     <RadioButton
                         android:id="@+id/radioExercise"
@@ -88,13 +88,11 @@
 
             </LinearLayout>
 
-            <GridView
-                android:id="@+id/photoGridView"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/insertPhotoView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:numColumns="4">
+                android:layout_height="wrap_content"/>
 
-            </GridView>
 
             <EditText
                 android:id="@+id/newMainText"
@@ -108,9 +106,9 @@
                 android:id="@+id/testImg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_launcher"
+                android:layout_gravity="center"
                 android:layout_margin="10dp"
-                android:layout_gravity="center"/>
+                android:src="@mipmap/ic_launcher" />
 
         </LinearLayout>
     </ScrollView>

@@ -1,6 +1,7 @@
 package com.example.andprojcommunity.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class FeedDTO implements Serializable, Comparable<FeedDTO> {
     private int no;
@@ -10,13 +11,15 @@ public class FeedDTO implements Serializable, Comparable<FeedDTO> {
     private String mainText;
     private int feedType;
     private String date;
-    private String imageURL;
+//    private String imageURL;
+
+    private ArrayList<String> imageList;
 
     public FeedDTO(){
         this(0,null,null,null,null,1,null,null);
     }
 
-    public FeedDTO(int no, String userID, String userName, String title, String mainText, int feedType, String date, String imageURL){
+    public FeedDTO(int no, String userID, String userName, String title, String mainText, int feedType, String date, ArrayList<String> imageList){
         this.no = no;
         this.userID = userID;
         this.userName = userName;
@@ -24,7 +27,7 @@ public class FeedDTO implements Serializable, Comparable<FeedDTO> {
         this.mainText = mainText;
         this.feedType = feedType;
         this.date = date;
-        this.imageURL = imageURL;
+        this.imageList = imageList;
     }
 
     public int getNo() {
@@ -83,12 +86,12 @@ public class FeedDTO implements Serializable, Comparable<FeedDTO> {
         this.date = date;
     }
 
-    public String getImageURL() {
-        return imageURL;
+    public ArrayList<String> getImageList() {
+        return imageList;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setImageList(ArrayList<String> imageList) {
+        this.imageList = imageList;
     }
 
     @Override
@@ -101,7 +104,7 @@ public class FeedDTO implements Serializable, Comparable<FeedDTO> {
                 ", mainText='" + mainText + '\'' +
                 ", feedType=" + feedType +
                 ", date='" + date + '\'' +
-                ", imageURL='" + imageURL + '\'' +
+                ", imageURL='" + imageList + '\'' +
                 '}';
     }
 

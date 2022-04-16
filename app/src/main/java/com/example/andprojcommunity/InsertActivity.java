@@ -1,6 +1,7 @@
 package com.example.andprojcommunity;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,7 +37,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.andprojcommunity.adapter.PhotoAdapter;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
 import com.example.andprojcommunity.model.UserAccount;
@@ -57,6 +61,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -92,7 +97,11 @@ public class InsertActivity extends AppCompatActivity {
 
     RadioGroup radioGroup;
 
-    GridView gridView;
+    RecyclerView photoView;
+
+    ArrayList<Bitmap> photoList = new ArrayList<>();
+    PhotoAdapter adapter;
+    ArrayList<Uri>  photoUriList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,9 +119,6 @@ public class InsertActivity extends AppCompatActivity {
             }
         }
 
-
-
-
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("DB");
 
@@ -120,7 +126,9 @@ public class InsertActivity extends AppCompatActivity {
         newMainText = findViewById(R.id.newMainText);
         btnImgAdd = findViewById(R.id.btnImgAdd);
         radioGroup = findViewById(R.id.radioGroup);
-        gridView = findViewById(R.id.photoGridView);
+        photoView = findViewById(R.id.insertPhotoView);
+        photoView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+
         img1 = findViewById(R.id.testImg);
 
         Toolbar toolbar = findViewById(R.id.insertToolbar);
@@ -225,47 +233,48 @@ public class InsertActivity extends AppCompatActivity {
                            if(!task.isSuccessful()){
                                System.out.println("실패");
                            }else{
-                               final String cu = "testUserID";
+                               ArrayList<String> filenameList = new ArrayList<>();
+                               UserAccount user = MainActivity.getUserInstance();
+                               for(int i = 0; i<photoUriList.size(); i++){
 
-                               String filename = cu + "_"+System.currentTimeMillis();
-                               StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child("photo/" + filename);
+                                   String filename = System.currentTimeMillis()+"";
+                                   // 스토리지 저장소경로 수정
+                                   filenameList.add(filename);
+                                   StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child(user.getIdToken()+"/" + filename);
+                                   UploadTask uploadTask;
 
-                               UploadTask uploadTask;
+                                   Uri file = null;
+                                   if(flag == 0){
+                                       file = Uri.fromFile(new File(mCurrentPhotoPath));
+                                   }else if(flag == 1){
+//                                       file = photoURI;
+                                       file = photoUriList.get(i);
+                                   }
 
-                               Uri file = null;
-                               if(flag == 0){
-                                   file = Uri.fromFile(new File(mCurrentPhotoPath));
-                               }else if(flag == 1){
-                                   file = photoURI;
+                                   uploadTask = storageRef.putFile(file);
+
+                                   uploadTask.addOnFailureListener(new OnFailureListener() {
+                                       @Override
+                                       public void onFailure(@NonNull Exception e) {
+                                           System.out.println("업로드 실패");
+                                           e.printStackTrace();
+                                       }
+                                   }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                       @Override
+                                       public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                           System.out.println("업로드 성공");
+                                       }
+                                   });
                                }
-
-                               uploadTask = storageRef.putFile(file);
-//                               final ProcessDialog processDialog = new
-
-                               uploadTask.addOnFailureListener(new OnFailureListener() {
-                                   @Override
-                                   public void onFailure(@NonNull Exception e) {
-                                       System.out.println("업로드 실패");
-                                       e.printStackTrace();
-                                   }
-                               }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                   @Override
-                                   public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                                       System.out.println("업로드 성공");
-                                   }
-                               });
-
 
                                long seq = (Long)task.getResult().getValue();
 
                                RadioButton rb = (RadioButton)findViewById(radioGroup.getCheckedRadioButtonId());
                                int feedType = ((rb.getText().toString()).equals("Exercise") ? 2 : 1);
 
-                               UserAccount user = MainActivity.getUserInstance();
-
-                               FeedDTO feed = new FeedDTO((int)seq, user.getEmailId(), user.getName(), newTitle.getText().toString(), newMainText.getText().toString()
-                                       , feedType, currentTime(), filename);
+                               FeedDTO feed = new FeedDTO((int)seq, user.getIdToken(), user.getName(), newTitle.getText().toString(), newMainText.getText().toString()
+                                       , feedType, currentTime(), filenameList);
 
                                databaseReference.child("Feeds").child("Sequence").setValue(seq +1);
                                databaseReference.child("Feeds").child(seq+"").setValue(feed).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -385,7 +394,8 @@ public class InsertActivity extends AppCompatActivity {
         //앨범 열기
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
 
         startActivityForResult(intent, FROM_ALBUM);
@@ -407,15 +417,64 @@ public class InsertActivity extends AppCompatActivity {
 
             case FROM_ALBUM:{
                 // 앨범 가져오기
+
                 if(data.getData()!= null){
-                    try{
-                        photoURI = data.getData();
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),photoURI);
-                        img1.setImageBitmap(bitmap);
-                    }catch (Exception e){
-                        e.printStackTrace();
+                    if(data.getClipData() == null){
+                        System.out.println("sing Image choice : "+String.valueOf(data.getData()));
+                        Uri imageUri = data.getData();
+                        photoUriList.add(imageUri);
+
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
+                            photoList.add(bitmap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        adapter = new PhotoAdapter(photoList);
+                        photoView.setAdapter(adapter);
+
+                    }else{
+                        ClipData clipData = data.getClipData();
+                        System.out.println("multi Image Choice : "+ String.valueOf(clipData.getItemCount()));
+
+                        if(clipData.getItemCount() > 4){
+                            Toast.makeText(getApplicationContext(), "사진은 4장까지 선택 가능합니다.", Toast.LENGTH_LONG).show();
+                        }else{
+                            System.out.println("multi choice");
+
+                            photoList.clear();
+                            photoUriList.clear();
+                            for(int i =0; i<clipData.getItemCount(); i++){
+                                Uri imageUri = clipData.getItemAt(i).getUri();
+                                photoUriList.add(imageUri);
+                                try {
+                                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
+                                    photoList.add(bitmap);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                adapter = new PhotoAdapter(photoList);
+                                photoView.setAdapter(adapter);
+                            }
+                        }
                     }
+//                    try{
+//                        photoURI = data.getData();
+//                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),photoURI);
+//                        photoList.add(bitmap);
+//                        img1.setImageBitmap(bitmap);
+//
+//                        adapter = new PhotoAdapter(photoList);
+//                        photoView.setAdapter(adapter);
+//
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+                }else{
+                    Toast.makeText(getApplicationContext(), "이미지를 선택하지 않았습니다.", Toast.LENGTH_LONG).show();
                 }
+
                 break;
             }
 
@@ -463,18 +522,26 @@ public class InsertActivity extends AppCompatActivity {
 
 
 
-    public class PhothGridView extends BaseAdapter{
+    public class PhotoGridViewAdapter extends BaseAdapter{
         Context context;
+        ArrayList<String> imgList = new ArrayList<>();
 
-        public PhothGridView(Context context){
-            context = context;
+        ImageView imgItem;
+        ImageButton btnImgDelete;
+
+        public PhotoGridViewAdapter(Context context, ArrayList<String> list){
+            this.context = context;
+            this.imgList = list;
         }
 
 
         @Override
         public int getCount() {
-
-            return 0;
+            if(imgList!= null) {
+                return imgList.size();
+            }else{
+                return 0;
+            }
         }
 
         @Override
@@ -489,7 +556,13 @@ public class InsertActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            return null;
+            View photoItem = View.inflate(context, R.layout.item_photo, null);
+            imgItem = photoItem.findViewById(R.id.photoImg);
+            btnImgDelete = photoItem.findViewById(R.id.btnphotoDelete);
+
+
+
+            return photoItem;
         }
     }
 }

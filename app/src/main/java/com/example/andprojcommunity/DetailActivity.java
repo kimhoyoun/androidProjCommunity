@@ -48,7 +48,6 @@ public class DetailActivity extends AppCompatActivity {
 
     Button btnNewComment;
     EditText newCommnetText;
-    ImageView loadImg;
 
     ArrayList<CommentDTO> commentList;
 
@@ -59,6 +58,7 @@ public class DetailActivity extends AppCompatActivity {
     DatabaseReference databaseReference ;
 
 
+    ImageView[] imageViewArray = new ImageView[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,29 +72,38 @@ public class DetailActivity extends AppCompatActivity {
 
         btnNewComment = (Button)findViewById(R.id.btnNewComment);
         newCommnetText = (EditText)findViewById(R.id.newCommnetText);
-        loadImg = findViewById(R.id.loadImg);
+        imageViewArray[0] = findViewById(R.id.loadImg1);
+        imageViewArray[1] = findViewById(R.id.loadImg2);
+        imageViewArray[2] = findViewById(R.id.loadImg3);
+        imageViewArray[3] = findViewById(R.id.loadImg4);
+
 
         detailCommentRecyclerView = findViewById(R.id.detailCommentRecyclerView);
         detailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        loadImg.setVisibility(View.INVISIBLE);
+
 
         // 이미지 로드
-        if(dto.getImageURL()!= null){
+        if(dto.getImageList()!= null){
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageReference = storage.getReference().child("photo");
+            StorageReference storageReference = storage.getReference().child(dto.getUserID());
             if(storageReference == null){
                 Toast.makeText(DetailActivity.this, "저장소에 사진이 없습니다.", Toast.LENGTH_SHORT).show();
             }else{
-                StorageReference loadImageUrl = storageReference.child(dto.getImageURL());
-                System.out.println(loadImageUrl);
-                loadImageUrl.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Glide.with(DetailActivity.this).load(uri).into(loadImg);
-                        loadImg.setVisibility(View.VISIBLE);
-                    }
-                });
+                for(int i =0; i<dto.getImageList().size(); i++) {
+                    final int index;
+                    index = i;
+                    System.out.println(dto.getImageList().get(index));
+                    StorageReference loadImageUrl = storageReference.child(dto.getImageList().get(index));
+                    System.out.println(loadImageUrl);
+                    loadImageUrl.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Glide.with(DetailActivity.this).load(uri).into(imageViewArray[index]);
+//                            imageViewArray[index].setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
             }
         }
 
