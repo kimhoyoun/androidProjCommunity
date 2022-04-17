@@ -1,16 +1,23 @@
 package com.example.andprojcommunity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Gallery;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +33,7 @@ import com.example.andprojcommunity.adapter.CommentAdapter;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -57,8 +65,11 @@ public class DetailActivity extends AppCompatActivity {
     FirebaseDatabase database ;
     DatabaseReference databaseReference ;
 
+    ArrayList<Uri> photoList;
 
-    ImageView[] imageViewArray = new ImageView[4];
+    RecyclerView recyclerView;
+
+    MyRecyclerViewAdapter recyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +83,10 @@ public class DetailActivity extends AppCompatActivity {
 
         btnNewComment = (Button)findViewById(R.id.btnNewComment);
         newCommnetText = (EditText)findViewById(R.id.newCommnetText);
-        imageViewArray[0] = findViewById(R.id.loadImg1);
-        imageViewArray[1] = findViewById(R.id.loadImg2);
-        imageViewArray[2] = findViewById(R.id.loadImg3);
-        imageViewArray[3] = findViewById(R.id.loadImg4);
+        recyclerView = findViewById(R.id.detail_recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
 
+        photoList = new ArrayList<>();
 
         detailCommentRecyclerView = findViewById(R.id.detailCommentRecyclerView);
         detailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -99,13 +109,18 @@ public class DetailActivity extends AppCompatActivity {
                     loadImageUrl.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Glide.with(DetailActivity.this).load(uri).into(imageViewArray[index]);
-//                            imageViewArray[index].setVisibility(View.VISIBLE);
+                            photoList.add(uri);
+                            recyclerViewAdapter.notifyDataSetChanged();
                         }
+
                     });
                 }
+                recyclerViewAdapter = new MyRecyclerViewAdapter(photoList);
+                recyclerView.setAdapter(recyclerViewAdapter);
             }
         }
+
+
 
         database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
         databaseReference = database.getReference().child("DB");
@@ -220,6 +235,25 @@ public class DetailActivity extends AppCompatActivity {
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        if(dto.getImageList() != null) {
+                            for (int i = 0; i < dto.getImageList().size(); i++) {
+                                FirebaseStorage storage = FirebaseStorage.getInstance();
+                                StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child(dto.getUserID() + "/" + dto.getImageList().get(i));
+                                storageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        System.out.println("삭제 성공");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        System.out.println("삭제 실패");
+                                    }
+                                });
+                            }
+                        }
                         databaseReference.child("Feeds").child(dto.getNo()+"").setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -244,4 +278,53 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder>{
+        ArrayList<Uri> imageList;
+
+
+        public MyRecyclerViewAdapter(ArrayList<Uri> list){
+            imageList = list;
+        }
+
+        @NonNull
+        @Override
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            Context context = parent.getContext();
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View view = inflater.inflate(R.layout.detail_photo, parent, false);
+            MyViewHolder viewHolder = new MyViewHolder(view, imageList);
+
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+            if(getItemCount() != 0){
+
+                Glide.with(DetailActivity.this).load(imageList.get(position)).into(holder.image);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            if(imageList!= null) {
+                return imageList.size();
+            }else{
+                return 0;
+            }
+        }
+
+
+        public class MyViewHolder extends RecyclerView.ViewHolder{
+            public ImageView image;
+
+            public MyViewHolder(@NonNull View itemView, ArrayList<Uri> list){
+                super(itemView);
+
+                image = itemView.findViewById(R.id.detail_photoItem);
+
+            }
+        }
+    }
 }

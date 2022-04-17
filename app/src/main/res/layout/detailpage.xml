@@ -53,36 +53,10 @@
 
             </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/loadImg1"
-                    android:layout_width="200dp"
-                    android:layout_height="300dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:layout_margin="10dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/loadImg2"
-                    android:layout_width="200dp"
-                    android:layout_height="300dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:layout_margin="10dp"
-                    android:layout_gravity="center"/>
-                <ImageView
-                    android:id="@+id/loadImg3"
-                    android:layout_width="200dp"
-                    android:layout_height="300dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:layout_margin="10dp"
-                    android:layout_gravity="center"/>
-                <ImageView
-                    android:id="@+id/loadImg4"
-                    android:layout_width="200dp"
-                    android:layout_height="300dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:layout_margin="10dp"
-                    android:layout_gravity="center"/>
-
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/detail_recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

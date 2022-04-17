@@ -88,10 +88,11 @@
 
             </LinearLayout>
 
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/insertPhotoView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
 
             <EditText
@@ -127,5 +128,13 @@
             android:layout_height="wrap_content"
             android:src="@drawable/comment"
             android:background="@color/white"/>
+
+        <TextView
+            android:id="@+id/photoNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0/4"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"/>
     </LinearLayout>
 </RelativeLayout>
