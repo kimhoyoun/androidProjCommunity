@@ -14,11 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.andprojcommunity.MainActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.adapter.CommentAdapter;
 import com.example.andprojcommunity.adapter.FeedAdapter;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
+import com.example.andprojcommunity.model.UserAccount;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,6 +49,8 @@ public class MyPageFragment extends Fragment{
     FirebaseDatabase database;
     DatabaseReference databaseReference;
 
+    UserAccount user = MainActivity.getUserInstance();
+
     public MyPageFragment(Context context){
         this.context = context;
     }
@@ -61,7 +65,9 @@ public class MyPageFragment extends Fragment{
         btnProfileComment = (Button) view.findViewById(R.id.btnProfileComment);
         profileTabName = (TextView) view.findViewById(R.id.profileTabName);
 
-        database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+        profileText.setText(user.getName());
+
+        database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("DB");
 
         recyclerView = view.findViewById(R.id.mypage_recyclerView);
@@ -72,12 +78,11 @@ public class MyPageFragment extends Fragment{
         btnProfileFeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                profileTabName.setText("내가 쓴 게시글");
 
 
-                Query myQuery = databaseReference.child("Feeds").orderByChild("userID").equalTo("user1");
+                Query myQuery = databaseReference.child("Feeds").orderByChild("userID").equalTo(user.getIdToken());
 
-                myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                myQuery.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         dtoList.clear();
@@ -94,22 +99,23 @@ public class MyPageFragment extends Fragment{
                     }
                 });
 
-
-
                 feedAdapter = new FeedAdapter(dtoList);
                 recyclerView.setAdapter(feedAdapter);
-
+                if(dtoList.size() == 0){
+                    profileTabName.setText("내가 쓴 글 없음");
+                }else{
+                    profileTabName.setText("내가 쓴 게시글");
+                }
             }
         });
 
         btnProfileComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                profileTabName.setText("내가 쓴 댓글");
 
-                Query myQuery = databaseReference.child("Comments").orderByChild("comment_user").equalTo("user1");
+                Query myQuery = databaseReference.child("Comments").orderByChild("comment_userID").equalTo(user.getIdToken());
 
-                myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                myQuery.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         commentList.clear();
@@ -129,84 +135,15 @@ public class MyPageFragment extends Fragment{
                 commentAdapter = new CommentAdapter(commentList);
                 recyclerView.setAdapter(commentAdapter);
 
+                if(commentList.size() == 0){
+                    profileTabName.setText("내가 쓴 댓글 없음");
+                }else{
+                    profileTabName.setText("내가 쓴 댓글");
+                }
             }
         });
 
         return view;
-    }
-
-
-    public ArrayList<FeedDTO> searchMyFeed(){
-
-        ArrayList<FeedDTO> list = new ArrayList<>();
-
-
-        // myFeed search
-//        try{
-//            if(sqlDB != null){
-//                String query = getString(R.string.myselectAllQuery);
-//                Cursor cursor = sqlDB.rawQuery(query,null);
-//                int count = cursor.getCount();
-//
-//                for(int i =0; i<count; i++){
-//                    cursor.moveToNext();
-//                    int no = cursor.getInt(0);
-//                    String userID = cursor.getString(1);
-//                    String title = cursor.getString(2);
-//                    String mainText = cursor.getString(3);
-//                    int likeNum = cursor.getInt(4);
-//                    int cName = cursor.getInt(5);
-//                    String date = cursor.getString(6);
-//
-//                    CommunityItemDTO dto = new CommunityItemDTO(no, userID, title, mainText, likeNum, cName, date);
-//
-//                    list.add(dto);
-//
-//                }
-//            } else{
-//                android.util.Log.i("결과", "실패");
-//            }
-//        } catch(Exception e){
-//            e.printStackTrace();
-//        }
-
-        return list;
-    }
-
-
-    public ArrayList<CommentDTO> setComment(){
-        ArrayList<CommentDTO> list = new ArrayList<>();
-
-        // comment search
-//        sqlDB = myHelper.getReadableDatabase();
-//
-//        try{
-//            if(sqlDB != null){
-//                Cursor cursor = sqlDB.rawQuery("select * from comment where comment_user = 'user6'",null);
-//                int count = cursor.getCount();
-//
-//                android.util.Log.i("결과", count+"");
-//                for(int i =0; i<count; i++){
-//                    cursor.moveToNext();
-//                    int no = cursor.getInt(0);
-//                    String comment_user = cursor.getString(1);
-//                    String comment_text = cursor.getString(2);
-//                    String feed_user = cursor.getString(3);
-//                    int feed_no = cursor.getInt(4);
-//                    String comment_time = cursor.getString(5);
-//                    CommentDTO dto = new CommentDTO(no, comment_user, comment_text, feed_user, feed_no, comment_time);
-//
-//                    list.add(dto);
-//
-//                }
-//            } else{
-//                android.util.Log.i("결과", "실패");
-//            }
-//        } catch(Exception e){
-//            e.printStackTrace();
-//        }
-
-        return list;
     }
 
 }

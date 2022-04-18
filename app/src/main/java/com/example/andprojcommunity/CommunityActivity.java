@@ -30,20 +30,11 @@ public class CommunityActivity extends AppCompatActivity{
         Toolbar toolbar = findViewById(R.id.communityToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Community Page");
+        getSupportActionBar().setTitle("Community Page - Feed List");
 
         fragment0 = new FeedFragment(CommunityActivity.this);
         fragment1 = new SearchFragment(CommunityActivity.this);
         fragment2 = new MyPageFragment(CommunityActivity.this);
-
-//        UserAccount user = MainActivity.getUserInstance();
-//        System.out.println("user : " +user);
-//        System.out.println("userInstance : " +MainActivity.getUserInstance());
-//
-//        System.out.println();
-//        user.setName("hohohohohoo");
-//        System.out.println("user : " +user);
-//        System.out.println("userInstance : " +MainActivity.getUserInstance());
 
         selected = fragment0;
         getSupportFragmentManager().beginTransaction().add(R.id.frame, fragment0).commit();
@@ -59,10 +50,13 @@ public class CommunityActivity extends AppCompatActivity{
 
                 if(position == 0){
                     selected = fragment0;
+                    getSupportActionBar().setTitle("Community - Feed List Page");
                 }else if(position == 1){
                     selected = fragment1;
+                    getSupportActionBar().setTitle("Community - Search Page");
                 }else if(position == 2){
                     selected = fragment2;
+                    getSupportActionBar().setTitle("Community - My Profile Page");
                 }
 
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame, selected).commit();

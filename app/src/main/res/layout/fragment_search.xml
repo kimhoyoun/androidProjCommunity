@@ -14,12 +14,55 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:text="FeedType"
+                android:textSize="20dp" />
+
+            <RadioGroup
+                android:id="@+id/search_radioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/search_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:checked="true"
+                    android:text="All" />
+
+                <RadioButton
+                    android:id="@+id/search_food"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:text="Food" />
+
+                <RadioButton
+                    android:id="@+id/search_exercise"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exercise" />
+
+
+            </RadioGroup>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <EditText
                 android:id="@+id/searchText"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:hint="userID 입력"/>
+                android:hint="검색할 내용 입력"/>
 
             <Button
                 android:id="@+id/btnSearch"
@@ -30,22 +73,6 @@
 
 
         </LinearLayout>
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="@color/black">-->
-
-<!--        <ScrollView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginTop="1px"-->
-<!--            android:background="@color/white">-->
-
-<!--            <LinearLayout-->
-<!--                android:id="@+id/scrollViewInLayout2"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="vertical">-->
 
         <TextView
             android:id="@+id/resultText"
@@ -53,10 +80,6 @@
             android:layout_height="wrap_content"
             android:text="검색내용 없음"
             android:textAlignment="center" />
-
-<!--            </LinearLayout>-->
-<!--        </ScrollView>-->
-<!--    </LinearLayout>-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_rectclerView"

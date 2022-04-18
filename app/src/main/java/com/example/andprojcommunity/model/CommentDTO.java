@@ -4,18 +4,20 @@ public class CommentDTO {
 
     private int no;
     private String comment_user;
+    private String comment_userID;
     private String comment_text;
     private String feed_user;
     private int feed_no;
     private String date;
 
     public CommentDTO(){
-        this(0, null, null, null, 0, null);
+        this(0, null,null, null, null, 0, null);
     }
 
-    public CommentDTO(int no, String comment_user, String comment_text, String feed_user, int feed_no, String date){
+    public CommentDTO(int no, String comment_user, String comment_userID,String comment_text, String feed_user, int feed_no, String date){
         this.no = no;
         this.comment_user = comment_user;
+        this.comment_userID = comment_userID;
         this.comment_text = comment_text;
         this.feed_user = feed_user;
         this.feed_no = feed_no;
@@ -37,6 +39,14 @@ public class CommentDTO {
 
     public void setComment_user(String comment_user) {
         this.comment_user = comment_user;
+    }
+
+    public String getComment_userID() {
+        return comment_userID;
+    }
+
+    public void setComment_userID(String comment_userID) {
+        this.comment_userID = comment_userID;
     }
 
     public String getComment_text() {
@@ -76,6 +86,7 @@ public class CommentDTO {
         return "CommentDTo{" +
                 "no=" + no +
                 ", comment_user='" + comment_user + '\'' +
+                ", comment_userID='" + comment_userID + '\'' +
                 ", comment_text='" + comment_text + '\'' +
                 ", feed_user='" + feed_user + '\'' +
                 ", feed_no=" + feed_no +

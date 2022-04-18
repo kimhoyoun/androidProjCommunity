@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.example.andprojcommunity.adapter.CommentAdapter;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
+import com.example.andprojcommunity.model.UserAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,7 +47,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -57,25 +60,21 @@ public class DetailActivity extends AppCompatActivity {
     Button btnNewComment;
     EditText newCommnetText;
 
-    ArrayList<CommentDTO> commentList;
-
     RecyclerView detailCommentRecyclerView;
     CommentAdapter commentAdapter;
+    ArrayList<CommentDTO> commentList;
+
+    RecyclerView recyclerView;
+    MyRecyclerViewAdapter recyclerViewAdapter;
+    ArrayList<Uri> photoList;
 
     FirebaseDatabase database ;
     DatabaseReference databaseReference ;
-
-    ArrayList<Uri> photoList;
-
-    RecyclerView recyclerView;
-
-    MyRecyclerViewAdapter recyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detailpage);
-
 
         imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
         Intent intent = getIntent();
@@ -122,7 +121,7 @@ public class DetailActivity extends AppCompatActivity {
 
 
 
-        database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+        database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("DB");
 
         commentList = new ArrayList<>();
@@ -176,8 +175,9 @@ public class DetailActivity extends AppCompatActivity {
                             if(!task.isSuccessful()){
                                 System.out.println("실패");
                             }else{
+                                UserAccount user = MainActivity.getUserInstance();
                                 long seq = (Long)task.getResult().getValue();
-                                CommentDTO comment = new CommentDTO((int)seq, "user3",newCommnetText.getText().toString(), dto.getUserID(), dto.getNo(), "2022-04-03 16:26:10");
+                                CommentDTO comment = new CommentDTO((int)seq, user.getName(), user.getIdToken(),newCommnetText.getText().toString(), dto.getUserID(), dto.getNo(), currentTime());
 
                                 databaseReference.child("Comments").child(seq+"").setValue(comment);
                                 databaseReference.child("Comments").child("Sequence").setValue(seq +1);
@@ -210,7 +210,10 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        UserAccount user = MainActivity.getUserInstance();
+        if(user.getIdToken().equals(dto.getUserID())){
         getMenuInflater().inflate(R.menu.detailmenu, menu);
+        }
 
        return true;
     }
@@ -239,7 +242,11 @@ public class DetailActivity extends AppCompatActivity {
                         if(dto.getImageList() != null) {
                             for (int i = 0; i < dto.getImageList().size(); i++) {
                                 FirebaseStorage storage = FirebaseStorage.getInstance();
+
+                                // 스토리지 레퍼런스 주소 수정
                                 StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child(dto.getUserID() + "/" + dto.getImageList().get(i));
+
+
                                 storageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -252,6 +259,13 @@ public class DetailActivity extends AppCompatActivity {
                                         System.out.println("삭제 실패");
                                     }
                                 });
+                            }
+                        }
+                        if(commentList != null || commentList.size() != 0) {
+                            for (int i = 0; i < commentList.size(); i++) {
+                                databaseReference.child("Comments").child(commentList.get(i).getNo() + "").setValue(null);
+
+                                System.out.println(commentList.get(i).getNo() +" 삭제");
                             }
                         }
                         databaseReference.child("Feeds").child(dto.getNo()+"").setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -278,9 +292,17 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public String currentTime(){
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String getTime = sdf.format(date);
+        return getTime;
+    }
+
     public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder>{
         ArrayList<Uri> imageList;
-
 
         public MyRecyclerViewAdapter(ArrayList<Uri> list){
             imageList = list;
@@ -301,7 +323,6 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             if(getItemCount() != 0){
-
                 Glide.with(DetailActivity.this).load(imageList.get(position)).into(holder.image);
             }
         }
@@ -314,7 +335,6 @@ public class DetailActivity extends AppCompatActivity {
                 return 0;
             }
         }
-
 
         public class MyViewHolder extends RecyclerView.ViewHolder{
             public ImageView image;

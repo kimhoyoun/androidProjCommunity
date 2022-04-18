@@ -27,22 +27,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     private ArrayList<Uri> updatePhotoList;
     TextView photoNum;
 
-    String flag = "insert";
 
     public PhotoAdapter(ArrayList<Uri> list, TextView photoNum){
         photoList = list;
         this.photoNum = photoNum;
-        flag = "insert";
+
 
     }
-
-//    public PhotoAdapter(ArrayList<Uri> list){
-//        updatePhotoList = list;
-//        flag = "update";
-//
-//
-//    }
-
 
     @NonNull
     @Override
@@ -52,11 +43,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
 
         View view = inflater.inflate(R.layout.item_photo, parent, false);
         PhotoViewHolder viewHolder = null;
-        if(flag.equals("insert")) {
+
             viewHolder = new PhotoViewHolder(context, view, photoList, this);
-        }else if(flag.equals("update")){
-            viewHolder = new PhotoViewHolder(view, updatePhotoList, this);
-        }
 
         return viewHolder;
     }
@@ -66,15 +54,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
 
         Glide.with(holder.context).load(photoList.get(position)).into(holder.imgItem);
 
-//        if(getItemCount()!= 0){
-//            if(flag.equals("insert")){
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(InsertActivity.getContentResolver(), photoList.get(position));
-//
-////                holder.imgItem.setImageBitmap(photoList.get(position));
-//            }
-//
-//
-//        }
     }
 
     @Override
@@ -90,6 +69,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         public ImageView imgItem;
         public ImageButton btnImgDelete;
         Context context;
+
         public PhotoViewHolder(Context context, @NonNull View itemView, ArrayList<Uri> itemList, PhotoAdapter adapter) {
             super(itemView);
             this.context = context;

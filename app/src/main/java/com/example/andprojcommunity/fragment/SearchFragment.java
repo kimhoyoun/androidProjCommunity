@@ -3,6 +3,7 @@ package com.example.andprojcommunity.fragment;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -12,14 +13,18 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.andprojcommunity.InsertActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.adapter.FeedAdapter;
 import com.example.andprojcommunity.model.FeedDTO;
@@ -31,7 +36,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class SearchFragment extends Fragment {
@@ -51,6 +58,7 @@ public class SearchFragment extends Fragment {
     DatabaseReference databaseReference;
     InputMethodManager imm;
 
+    RadioGroup radioGroup;
     public SearchFragment( Context context){
         this.context = context;
     }
@@ -60,7 +68,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+        database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("DB");
 
         dtoList = new ArrayList<>();
@@ -68,6 +76,8 @@ public class SearchFragment extends Fragment {
         btnSearch = (Button) view.findViewById(R.id.btnSearch);
         searchText = (EditText) view.findViewById(R.id.searchText);
         resultText = (TextView) view.findViewById(R.id.resultText);
+        radioGroup = view.findViewById(R.id.search_radioGroup);
+
         imm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
 
         recyclerView = view.findViewById(R.id.search_rectclerView);
@@ -80,30 +90,88 @@ public class SearchFragment extends Fragment {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String userid = searchText.getText().toString();
-                if(!userid.equals("")){
+                String search = searchText.getText().toString();
+                ArrayList<FeedDTO> feedList = new ArrayList<>();
 
-                    Query myQuery = databaseReference.child("Feeds").orderByChild("userID").equalTo(userid);
+                if(!search.equals("")){
 
-                    myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            dtoList.clear();
-                            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                                FeedDTO feed = snapshot.getValue(FeedDTO.class);
-                                dtoList.add(feed);
+                    RadioButton rb = (RadioButton)view.findViewById(radioGroup.getCheckedRadioButtonId());
+                    if(!rb.getText().toString().equals("All")) {
+
+                        int feedType = ((rb.getText().toString()).equals("Exercise") ? 2 : 1);
+
+                        Query myQuery = databaseReference.child("Feeds").orderByChild("feedType").equalTo(feedType);
+                        myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                dtoList.clear();
+                                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                    FeedDTO feed = snapshot.getValue(FeedDTO.class);
+                                    if(feed.getTitle().contains(search) || feed.getMainText().contains(search)){
+                                        dtoList.add(feed);
+                                    }
+                                }
+                                Collections.sort(dtoList);
+                                Collections.sort(dtoList,Collections.reverseOrder());
+                                adapter.notifyDataSetChanged();
+                                if(dtoList.size() == 0){
+                                    resultText.setText("'"+rb.getText().toString() +"' 피드 중 '"+search+"'의 내용을 포함하는 검색 결과 없음");
+                                }else{
+                                    resultText.setText("'"+rb.getText().toString() +"' 피드 중 '"+search+"'의 내용을 포함하는 검색 결과");
+                                }
                             }
-                            adapter.notifyDataSetChanged();
-                        }
 
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }else{
+                        databaseReference.child("Feeds").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                dtoList.clear();
+                                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                    if(! (snapshot.getValue() instanceof Long)){
+                                        FeedDTO feed = snapshot.getValue(FeedDTO.class);
+                                        if(feed.getTitle().contains(search) || feed.getMainText().contains(search)){
+                                            dtoList.add(feed);
+                                        }
+
+                                    }
+                                }
+                                Collections.sort(dtoList);
+                                Collections.sort(dtoList,Collections.reverseOrder());
+                                adapter.notifyDataSetChanged();
+                                if(dtoList.size() == 0){
+                                    resultText.setText("'"+search+"'의 내용을 포함하는 검색 결과 없음");
+                                }else{
+                                    resultText.setText("'"+search+"'의 내용을 포함하는 검색 결과");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+
+                    imm.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
+
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("검색 오류");
+                    builder.setMessage("검색할 내용을 입력해 주세요!");
+
+                    builder.setNegativeButton("확인", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
+                        public void onClick(DialogInterface dialog, int which) {
 
                         }
                     });
 
-                    imm.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
-
+                    builder.create().show();
                 }
             }
         });

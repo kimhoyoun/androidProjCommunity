@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -44,6 +47,7 @@ public class FeedFragment extends Fragment {
     FirebaseDatabase database;
     DatabaseReference databaseReference;
 
+
     public FeedFragment(){
 
     }
@@ -61,9 +65,10 @@ public class FeedFragment extends Fragment {
         recyclerView = (RecyclerView)view.findViewById(R.id.feed_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
         btnNewFeed = (ImageButton)view.findViewById(R.id.btnNewFeed);
+
         feedList = new ArrayList<>();
 
-        database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+        database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("DB").child("Feeds");
 
 
@@ -99,6 +104,7 @@ public class FeedFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
         return view;
     }
 

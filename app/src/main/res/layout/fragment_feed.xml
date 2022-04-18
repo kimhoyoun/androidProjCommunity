@@ -2,16 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragment.FeedFragment_prev">
-
+    android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feed_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#E4E4E4"/>
-
 
     <ImageButton
         android:id="@+id/btnNewFeed"

@@ -21,9 +21,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.andprojcommunity.DetailActivity;
+import com.example.andprojcommunity.MainActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
+import com.example.andprojcommunity.model.UserAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -73,6 +75,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             holder.commentUserID.setText(dto.getComment_user());
             holder.commentText.setText(dto.getComment_text());
             holder.commentTime.setText(dto.getDate().substring(0,16));
+
+            UserAccount user = MainActivity.getUserInstance();
+            if(dto.getComment_userID().equals(user.getIdToken())){
+                holder.btnCommentMenu.setVisibility(View.VISIBLE);
+            }else{
+                holder.btnCommentMenu.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -105,8 +114,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             btnCommentMenu = itemView.findViewById(R.id.btnCommentMenu);
 
             this.className = className;
-
-
 
             if(className.equals("CommunityActivity")) {
                 btnCommentMenu.setVisibility(View.INVISIBLE);
@@ -142,7 +149,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                     builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+                                            database = FirebaseDatabase.getInstance();
                                             databaseReference = database.getReference().child("DB");
 
                                             String newText = editComment.getText().toString();
@@ -171,7 +178,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                     builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+                                            database = FirebaseDatabase.getInstance();
                                             databaseReference = database.getReference().child("DB");
 
                                             databaseReference.child("Comments").child(itemList.get(pos).getNo()+"").setValue(null);
@@ -206,15 +213,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                         int pos = getAdapterPosition();
                         if(pos != RecyclerView.NO_POSITION){
 
-
                             CommentDTO dto = itemList.get(pos);
 
                             String feedNo = dto.getFeed_no()+"";
 
-
                             // feed_no로 feed 객체 생성
 
-                            database = FirebaseDatabase.getInstance("https://androidproj-ab6fe-default-rtdb.firebaseio.com/");
+                            database = FirebaseDatabase.getInstance();
                             databaseReference = database.getReference().child("DB");
 
                             databaseReference.child("Feeds").child(feedNo).addListenerForSingleValueEvent(new ValueEventListener() {
