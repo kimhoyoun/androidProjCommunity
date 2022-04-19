@@ -4,9 +4,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,17 +16,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.andprojcommunity.InsertActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.adapter.FeedAdapter;
 import com.example.andprojcommunity.model.FeedDTO;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,18 +31,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-
 
 public class SearchFragment extends Fragment {
     Context context;
 
     Button btnSearch;
-
     EditText searchText;
     TextView resultText;
+    RadioGroup radioGroup;
 
     ArrayList<FeedDTO> dtoList;
 
@@ -58,7 +51,6 @@ public class SearchFragment extends Fragment {
     DatabaseReference databaseReference;
     InputMethodManager imm;
 
-    RadioGroup radioGroup;
     public SearchFragment( Context context){
         this.context = context;
     }
@@ -137,7 +129,6 @@ public class SearchFragment extends Fragment {
                                         if(feed.getTitle().contains(search) || feed.getMainText().contains(search)){
                                             dtoList.add(feed);
                                         }
-
                                     }
                                 }
                                 Collections.sort(dtoList);
@@ -151,9 +142,7 @@ public class SearchFragment extends Fragment {
                             }
 
                             @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
+                            public void onCancelled(@NonNull DatabaseError error) {}
                         });
                     }
 
@@ -166,11 +155,8 @@ public class SearchFragment extends Fragment {
 
                     builder.setNegativeButton("확인", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
+                        public void onClick(DialogInterface dialog, int which) {}
                     });
-
                     builder.create().show();
                 }
             }

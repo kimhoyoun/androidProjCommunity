@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -26,12 +25,10 @@ import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.model.CommentDTO;
 import com.example.andprojcommunity.model.FeedDTO;
 import com.example.andprojcommunity.model.UserAccount;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
@@ -46,7 +43,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     public CommentAdapter(ArrayList<CommentDTO> list){
         commentList =list;
-
     }
 
     @NonNull
@@ -59,11 +55,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         View view = inflater.inflate(R.layout.comment,parent,false);
 
         String str = context.getClass().toString();
-
         String className = str.substring(str.lastIndexOf('.')+1);
 
         CommentViewHolder viewHolder = new CommentViewHolder(context, view, commentList, className);
-
 
         return viewHolder;
     }
@@ -93,8 +87,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             return 0;
         }
     }
-
-
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {
 
@@ -130,7 +122,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                         final PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), view);
                         ((Activity)view.getContext()).getMenuInflater().inflate(R.menu.comment_menu, popupMenu.getMenu());
 
-
                         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
@@ -143,7 +134,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                     builder.setMessage("수정할 메세지를 입력해주세요!");
                                     final EditText editComment = new EditText(context);
                                     editComment.setText(comment.getComment_text());
-
                                     builder.setView(editComment);
 
                                     builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
@@ -159,16 +149,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
                                         }
                                     });
-
                                     builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             Toast.makeText(context, "수정 취소되었습니다.",Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
                                     builder.show();
-
                                 }else if(item.getItemId() == R.id.comment_delete){
 
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -186,16 +173,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
                                         }
                                     });
-
                                     builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             Toast.makeText(context, "취소되었습니다.",Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
                                     builder.show();
-
                                 }
                                 return false;
                             }
@@ -214,10 +198,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                         if(pos != RecyclerView.NO_POSITION){
 
                             CommentDTO dto = itemList.get(pos);
-
                             String feedNo = dto.getFeed_no()+"";
-
-                            // feed_no로 feed 객체 생성
 
                             database = FirebaseDatabase.getInstance();
                             databaseReference = database.getReference().child("DB");
@@ -245,71 +226,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
                 });
             }
-        }
-
-        public void redirect(Context context){
-            Intent intent = ((Activity)context).getIntent();
-            ((Activity)context).finish(); //현재 액티비티 종료 실시
-            ((Activity)context).overridePendingTransition(0, 0); //효과 없애기
-            ((Activity)context).startActivity(intent); //현재 액티비티 재실행 실시
-            ((Activity)context).overridePendingTransition(0, 0); //효과 없애기
-            Toast.makeText(context, "수정되었습니다.",Toast.LENGTH_SHORT).show();
-        }
-
-        public boolean commentDelete(CommentDTO item){
-            int num = item.getNo();
-
-//            String query = "delete from comment where no = "+num;
-//            sqlDB = myHelper.getWritableDatabase();
-//            sqlDB.execSQL(query);
-//            sqlDB.close();
-
-            return true;
-        }
-
-        public boolean commentUpdate(CommentDTO item){
-            String query = "update comment set comment_text = '"+item.getComment_text()+"' where no ="+item.getNo();
-//            sqlDB = myHelper.getWritableDatabase();
-//            sqlDB.execSQL(query);
-//            sqlDB.close();
-
-            return true;
-        }
-
-
-        public String dateForm(String date){
-            long mNow = System.currentTimeMillis();
-            Date format = null;
-            String result = "방금 전";
-
-            try {
-                format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(date);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            if(format != null) {
-                long diffSec = (mNow - format.getTime()) / 1000; //초 차이
-                long diffMin = (mNow - format.getTime()) / 60000; //분 차이
-                long diffHor = (mNow - format.getTime()) / 3600000; //시 차이
-                long diffDays = (mNow / (24 * 60 * 60)/1000) - (format.getTime()/(24*60*60)/1000);
-
-                if(diffDays != 0){
-                    result = diffDays+"일 전";
-                    return result;
-                }
-
-                if(diffDays==0 && diffHor != 0){
-                    result = diffHor + "시간 전";
-                    return result;
-                }
-
-                if(diffDays==0 && diffHor == 0 && diffMin != 0){
-                    result = diffMin + "분 전";
-                    return result;
-                }
-            }
-            return result;
         }
     }
 }

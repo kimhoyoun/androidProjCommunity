@@ -12,17 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.andprojcommunity.DetailActivity;
-import com.example.andprojcommunity.MainActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.model.FeedDTO;
-import com.example.andprojcommunity.model.UserAccount;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
@@ -30,7 +25,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     public FeedAdapter(ArrayList<FeedDTO> list){
         itemList =list;
-
     }
 
     @NonNull
@@ -70,7 +64,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             return 0;
         }
     }
-
 
     class FeedViewHolder extends RecyclerView.ViewHolder {
 

@@ -3,7 +3,6 @@ package com.example.andprojcommunity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,12 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -119,8 +115,6 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
 
-
-
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("DB");
 
@@ -162,8 +156,6 @@ public class DetailActivity extends AppCompatActivity {
         commentAdapter = new CommentAdapter(commentList);
         detailCommentRecyclerView.setAdapter(commentAdapter);
 
-
-
         btnNewComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,7 +180,6 @@ public class DetailActivity extends AppCompatActivity {
                         }
                     });
 
-
                 }else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(DetailActivity.this);
                     builder.setTitle("오류");
@@ -212,9 +203,8 @@ public class DetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         UserAccount user = MainActivity.getUserInstance();
         if(user.getIdToken().equals(dto.getUserID())){
-        getMenuInflater().inflate(R.menu.detailmenu, menu);
+            getMenuInflater().inflate(R.menu.detailmenu, menu);
         }
-
        return true;
     }
 
@@ -244,9 +234,7 @@ public class DetailActivity extends AppCompatActivity {
                                 FirebaseStorage storage = FirebaseStorage.getInstance();
 
                                 // 스토리지 레퍼런스 주소 수정
-                                StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child(dto.getUserID() + "/" + dto.getImageList().get(i));
-
-
+                                StorageReference storageRef = storage.getReference().child(dto.getUserID() + "/" + dto.getImageList().get(i));
                                 storageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {

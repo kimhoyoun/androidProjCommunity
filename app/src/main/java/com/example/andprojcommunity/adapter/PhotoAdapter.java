@@ -1,9 +1,7 @@
 package com.example.andprojcommunity.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,24 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.andprojcommunity.DetailActivity;
-import com.example.andprojcommunity.InsertActivity;
 import com.example.andprojcommunity.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
     private ArrayList<Uri> photoList;
-    private ArrayList<Uri> updatePhotoList;
     TextView photoNum;
 
 
     public PhotoAdapter(ArrayList<Uri> list, TextView photoNum){
         photoList = list;
         this.photoNum = photoNum;
-
-
     }
 
     @NonNull
@@ -42,9 +34,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View view = inflater.inflate(R.layout.item_photo, parent, false);
-        PhotoViewHolder viewHolder = null;
-
-            viewHolder = new PhotoViewHolder(context, view, photoList, this);
+        PhotoViewHolder viewHolder = new PhotoViewHolder(context, view, photoList, this);
 
         return viewHolder;
     }
@@ -68,8 +58,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     public class PhotoViewHolder extends RecyclerView.ViewHolder{
         public ImageView imgItem;
         public ImageButton btnImgDelete;
-        Context context;
-
+        public Context context;
         public PhotoViewHolder(Context context, @NonNull View itemView, ArrayList<Uri> itemList, PhotoAdapter adapter) {
             super(itemView);
             this.context = context;
@@ -83,25 +72,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
                     if (pos != RecyclerView.NO_POSITION) {
                         photoList.remove(pos);
                         photoNum.setText(photoList.size()+"/4");
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            });
-        }
-
-        public PhotoViewHolder(@NonNull View itemView, ArrayList<Uri> uriList, PhotoAdapter adapter) {
-            super(itemView);
-
-            imgItem = itemView.findViewById(R.id.photoImg);
-            btnImgDelete = itemView.findViewById(R.id.btnphotoDelete);
-
-            btnImgDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos != RecyclerView.NO_POSITION) {
-                        photoList.remove(pos);
-                        photoNum.setText(uriList.size()+"/4");
                         adapter.notifyDataSetChanged();
                     }
                 }

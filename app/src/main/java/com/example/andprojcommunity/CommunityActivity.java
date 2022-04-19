@@ -11,8 +11,6 @@ import androidx.fragment.app.Fragment;
 import com.example.andprojcommunity.fragment.FeedFragment;
 import com.example.andprojcommunity.fragment.MyPageFragment;
 import com.example.andprojcommunity.fragment.SearchFragment;
-import com.example.andprojcommunity.model.FeedDTO;
-import com.example.andprojcommunity.model.UserAccount;
 import com.google.android.material.tabs.TabLayout;
 
 public class CommunityActivity extends AppCompatActivity{
@@ -47,7 +45,6 @@ public class CommunityActivity extends AppCompatActivity{
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
 
-
                 if(position == 0){
                     selected = fragment0;
                     getSupportActionBar().setTitle("Community - Feed List Page");
@@ -63,14 +60,10 @@ public class CommunityActivity extends AppCompatActivity{
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
     }
@@ -83,6 +76,7 @@ public class CommunityActivity extends AppCompatActivity{
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 }
 

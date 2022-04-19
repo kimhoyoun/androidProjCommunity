@@ -102,10 +102,7 @@ public class InsertActivity extends AppCompatActivity {
     PhotoAdapter adapter;
     ArrayList<Uri>  photoUriList = new ArrayList<>();
 
-    ArrayList<Bitmap> photoList = new ArrayList<>();
     ArrayList<Uri> photoUpdate = new ArrayList<>();
-
-
     ArrayList<String> newImgList = null;
     ArrayList<String> filenameList = null;
 
@@ -191,7 +188,7 @@ public class InsertActivity extends AppCompatActivity {
         btnImgAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (photoList.size() < 4) {
+                if (photoUriList.size() < 4) {
                     final PopupMenu popupMenu = new PopupMenu(InsertActivity.this, view);
                     getMenuInflater().inflate(R.menu.camera_menu, popupMenu.getMenu());
 
@@ -591,7 +588,6 @@ public class InsertActivity extends AppCompatActivity {
         startActivityForResult(intent, FROM_ALBUM);
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -603,8 +599,6 @@ public class InsertActivity extends AppCompatActivity {
         switch (requestCode) {
 
             case FROM_ALBUM: {
-                // 앨범 가져오기
-
                 if (data.getData() != null) {
                     if (data.getClipData() == null) {
                         if (photoUriList.size() <= 4) {
@@ -612,23 +606,12 @@ public class InsertActivity extends AppCompatActivity {
                             Uri imageUri = data.getData();
                             System.out.println(imageUri);
                             photoUriList.add(imageUri);
-
-                            try {
-                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                                photoList.add(bitmap);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-//                            adapter = new PhotoAdapter(photoList, photoNum);
                             adapter = new PhotoAdapter(photoUriList, photoNum);
                             photoView.setAdapter(adapter);
 
                         } else {
                             noticePhoto();
                         }
-
-
                     } else {
                         ClipData clipData = data.getClipData();
                         System.out.println("multi Image Choice : " + String.valueOf(clipData.getItemCount()));
@@ -643,17 +626,10 @@ public class InsertActivity extends AppCompatActivity {
                                     Uri imageUri = clipData.getItemAt(i).getUri();
                                     photoUriList.add(imageUri);
                                     System.out.println(imageUri);
-                                    try {
-                                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                                        photoList.add(bitmap);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
                                 } else {
                                     noticePhoto();
                                 }
                             }
-//                            adapter = new PhotoAdapter(photoList, photoNum);
                             adapter = new PhotoAdapter(photoUriList, photoNum);
                             photoView.setAdapter(adapter);
                         }
@@ -661,44 +637,22 @@ public class InsertActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "이미지를 선택하지 않았습니다.", Toast.LENGTH_LONG).show();
                 }
-
                 break;
             }
 
             case REQUEST_TAKE_PHOTO:
                 if (resultCode == RESULT_OK) {
                     if (photoUriList.size() < 4) {
-
                         galleryAddPic();
                         File file = new File(mCurrentPhotoPath);
-                        Bitmap bitmap;
                         if (Build.VERSION.SDK_INT >= 29) {
-                            ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), Uri.fromFile(file));
-                            try {
-                                bitmap = ImageDecoder.decodeBitmap(source);
-                                if (bitmap != null) {
-                                    photoList.add(bitmap);
-                                    photoUriList.add(Uri.fromFile(file));
-//                                    adapter = new PhotoAdapter(photoList, photoNum);
-                                    adapter = new PhotoAdapter(photoUriList, photoNum);
-                                    photoView.setAdapter(adapter);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            photoUriList.add(Uri.fromFile(file));
+                            adapter = new PhotoAdapter(photoUriList, photoNum);
+                            photoView.setAdapter(adapter);
                         } else {
-                            try {
-                                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.fromFile(file));
-                                if (bitmap != null) {
-                                    photoList.add(bitmap);
-                                    photoUriList.add(Uri.fromFile(file));
-//                                    adapter = new PhotoAdapter(photoList, photoNum);
-                                    adapter = new PhotoAdapter(photoUriList, photoNum);
-                                    photoView.setAdapter(adapter);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            photoUriList.add(Uri.fromFile(file));
+                            adapter = new PhotoAdapter(photoUriList, photoNum);
+                            photoView.setAdapter(adapter);
                         }
                     }else{
                         noticePhoto();
@@ -714,10 +668,9 @@ public class InsertActivity extends AppCompatActivity {
         builder.setTitle("사진초과");
         builder.setMessage("사진은 4장까지 첨부할 수 있습니다!");
 
-        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
             }
         });
 

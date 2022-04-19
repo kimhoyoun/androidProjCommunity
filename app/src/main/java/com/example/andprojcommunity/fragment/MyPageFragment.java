@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.andprojcommunity.MainActivity;
 import com.example.andprojcommunity.R;
 import com.example.andprojcommunity.adapter.CommentAdapter;
@@ -79,9 +78,7 @@ public class MyPageFragment extends Fragment{
             @Override
             public void onClick(View v) {
 
-
                 Query myQuery = databaseReference.child("Feeds").orderByChild("userID").equalTo(user.getIdToken());
-
                 myQuery.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -89,14 +86,13 @@ public class MyPageFragment extends Fragment{
                         for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                             FeedDTO feed = snapshot.getValue(FeedDTO.class);
                             dtoList.add(feed);
+                            profileTabName.setText("내가 쓴 게시글");
                         }
                         feedAdapter.notifyDataSetChanged();
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
                 feedAdapter = new FeedAdapter(dtoList);
@@ -104,7 +100,7 @@ public class MyPageFragment extends Fragment{
                 if(dtoList.size() == 0){
                     profileTabName.setText("내가 쓴 글 없음");
                 }else{
-                    profileTabName.setText("내가 쓴 게시글");
+
                 }
             }
         });
@@ -122,14 +118,13 @@ public class MyPageFragment extends Fragment{
                         for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                             CommentDTO comment = snapshot.getValue(CommentDTO.class);
                             commentList.add(comment);
+                            profileTabName.setText("내가 쓴 댓글");
                         }
                         commentAdapter.notifyDataSetChanged();
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
 
                 commentAdapter = new CommentAdapter(commentList);
@@ -138,11 +133,10 @@ public class MyPageFragment extends Fragment{
                 if(commentList.size() == 0){
                     profileTabName.setText("내가 쓴 댓글 없음");
                 }else{
-                    profileTabName.setText("내가 쓴 댓글");
+
                 }
             }
         });
-
         return view;
     }
 
