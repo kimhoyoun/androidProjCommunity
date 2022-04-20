@@ -49,9 +49,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.userNameText.setText(dto.getUserName());
             holder.feedTime.setText(holder.dateForm(dto.getDate()));
             if(dto.getFeedType() == 2){
-                holder.feedType.setText("Exercise");
+                holder.feedType.setText("운동");
             }else {
-                holder.feedType.setText("Food");
+                holder.feedType.setText("맛집");
             }
         }
     }

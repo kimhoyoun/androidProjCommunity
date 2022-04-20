@@ -88,9 +88,9 @@ public class SearchFragment extends Fragment {
                 if(!search.equals("")){
 
                     RadioButton rb = (RadioButton)view.findViewById(radioGroup.getCheckedRadioButtonId());
-                    if(!rb.getText().toString().equals("All")) {
+                    if(!rb.getText().toString().equals("전체")) {
 
-                        int feedType = ((rb.getText().toString()).equals("Exercise") ? 2 : 1);
+                        int feedType = ((rb.getText().toString()).equals("운동") ? 2 : 1);
 
                         Query myQuery = databaseReference.child("Feeds").orderByChild("feedType").equalTo(feedType);
                         myQuery.addListenerForSingleValueEvent(new ValueEventListener() {

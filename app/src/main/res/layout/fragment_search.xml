@@ -20,7 +20,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:text="FeedType"
+                android:text="카테고리"
                 android:textSize="20dp" />
 
             <RadioGroup
@@ -35,20 +35,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
                     android:checked="true"
-                    android:text="All" />
+                    android:text="전체" />
 
                 <RadioButton
                     android:id="@+id/search_food"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
-                    android:text="Food" />
+                    android:text="맛집" />
 
                 <RadioButton
                     android:id="@+id/search_exercise"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Exercise" />
+                    android:text="운동" />
 
 
             </RadioGroup>
@@ -68,6 +68,7 @@
                 android:id="@+id/btnSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/green_700"
                 android:text="검색"
                 android:layout_margin="10dp"/>
 

@@ -41,6 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
+                android:backgroundTint="@color/green_700"
                 android:text="게시글"/>
             <Button
                 android:id="@+id/btnProfileComment"
@@ -48,6 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
+                android:backgroundTint="@color/green_700"
                 android:text="댓글"/>
         </LinearLayout>
         <LinearLayout

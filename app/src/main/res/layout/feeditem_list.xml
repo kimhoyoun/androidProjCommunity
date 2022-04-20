@@ -15,7 +15,7 @@
         android:layout_marginLeft="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Food"
+        android:text="맛집"
         android:padding="3dp"
         android:layout_gravity="center"
         android:background="#e3e3e3"/>

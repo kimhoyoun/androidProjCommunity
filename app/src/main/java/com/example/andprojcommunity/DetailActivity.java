@@ -123,7 +123,7 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.detailToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Detail Page");
+        getSupportActionBar().setTitle("상세보기");
 
         TextView title = (TextView) findViewById(R.id.detalTitle);
         TextView mainText = (TextView) findViewById(R.id.detailMainText);

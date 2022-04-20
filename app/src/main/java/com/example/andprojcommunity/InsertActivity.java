@@ -148,7 +148,7 @@ public class InsertActivity extends AppCompatActivity {
         if(intent.getSerializableExtra("dto")!=null){
             dto = (FeedDTO) intent.getSerializableExtra("dto");
             System.out.println(dto);
-            getSupportActionBar().setTitle("Update Page");
+            getSupportActionBar().setTitle("내 글 수정");
             newTitle.setText(dto.getTitle());
             newMainText.setText(dto.getMainText());
             photoNum.setText(dto.getImageList().size()+"/4");
@@ -182,7 +182,7 @@ public class InsertActivity extends AppCompatActivity {
             }
 
         }else{
-            getSupportActionBar().setTitle("Insert Page");
+            getSupportActionBar().setTitle("새 글 작성");
         }
 
         btnImgAdd.setOnClickListener(new View.OnClickListener() {
@@ -436,7 +436,7 @@ public class InsertActivity extends AppCompatActivity {
                                                long seq = (Long) task.getResult().getValue();
 
                                                RadioButton rb = (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId());
-                                               int feedType = ((rb.getText().toString()).equals("Exercise") ? 2 : 1);
+                                               int feedType = ((rb.getText().toString()).equals("운동") ? 2 : 1);
 
                                                FeedDTO feed = new FeedDTO((int) seq, user.getIdToken(), user.getName(), newTitle.getText().toString(), newMainText.getText().toString()
                                                        , feedType, currentTime(), filenameList);
@@ -463,7 +463,7 @@ public class InsertActivity extends AppCompatActivity {
                                    long seq = (Long) task.getResult().getValue();
 
                                    RadioButton rb = (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId());
-                                   int feedType = ((rb.getText().toString()).equals("Exercise") ? 2 : 1);
+                                   int feedType = ((rb.getText().toString()).equals("운동") ? 2 : 1);
 
                                    FeedDTO feed = new FeedDTO((int) seq, user.getIdToken(), user.getName(), newTitle.getText().toString(), newMainText.getText().toString()
                                            , feedType, currentTime(), filenameList);

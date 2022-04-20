@@ -28,7 +28,7 @@ public class CommunityActivity extends AppCompatActivity{
         Toolbar toolbar = findViewById(R.id.communityToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Community Page - Feed List");
+        getSupportActionBar().setTitle("커뮤니티");
 
         fragment0 = new FeedFragment(CommunityActivity.this);
         fragment1 = new SearchFragment(CommunityActivity.this);
@@ -47,13 +47,13 @@ public class CommunityActivity extends AppCompatActivity{
 
                 if(position == 0){
                     selected = fragment0;
-                    getSupportActionBar().setTitle("Community - Feed List Page");
+                    getSupportActionBar().setTitle("커뮤니티");
                 }else if(position == 1){
                     selected = fragment1;
-                    getSupportActionBar().setTitle("Community - Search Page");
+                    getSupportActionBar().setTitle("검색하기");
                 }else if(position == 2){
                     selected = fragment2;
-                    getSupportActionBar().setTitle("Community - My Profile Page");
+                    getSupportActionBar().setTitle("내 프로필");
                 }
 
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame, selected).commit();
