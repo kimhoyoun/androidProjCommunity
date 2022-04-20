@@ -1,10 +1,12 @@
 package com.example.andprojcommunity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -88,8 +90,9 @@ public class DetailActivity extends AppCompatActivity {
 
 
         // 이미지 로드
-        if(dto.getImageList()!= null){
 
+
+        if(dto.getImageList()!= null){
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference().child(dto.getUserID());
             if(storageReference == null){
@@ -98,16 +101,14 @@ public class DetailActivity extends AppCompatActivity {
                 for(int i =0; i<dto.getImageList().size(); i++) {
                     final int index;
                     index = i;
-                    System.out.println(dto.getImageList().get(index));
                     StorageReference loadImageUrl = storageReference.child(dto.getImageList().get(index));
-                    System.out.println(loadImageUrl);
                     loadImageUrl.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @SuppressLint("NotifyDataSetChanged")
                         @Override
                         public void onSuccess(Uri uri) {
                             photoList.add(uri);
                             recyclerViewAdapter.notifyDataSetChanged();
                         }
-
                     });
                 }
                 recyclerViewAdapter = new MyRecyclerViewAdapter(photoList);
@@ -221,30 +222,25 @@ public class DetailActivity extends AppCompatActivity {
                     finish();
                 return true;
             case R.id.detail_menuDelete:
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(DetailActivity.this);
                 builder.setTitle("삭제");
                 builder.setMessage("삭제하시겠습니까?");
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         if(dto.getImageList() != null) {
                             for (int i = 0; i < dto.getImageList().size(); i++) {
                                 FirebaseStorage storage = FirebaseStorage.getInstance();
-
-                                // 스토리지 레퍼런스 주소 수정
                                 StorageReference storageRef = storage.getReference().child(dto.getUserID() + "/" + dto.getImageList().get(i));
                                 storageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-
-                                        System.out.println("삭제 성공");
+                                        Log.i("Delete Result", "삭제되었습니다.");
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
-                                        System.out.println("삭제 실패");
+                                        Log.e("Delete Result", "삭제중 오류발생");
                                     }
                                 });
                             }
@@ -252,8 +248,6 @@ public class DetailActivity extends AppCompatActivity {
                         if(commentList != null || commentList.size() != 0) {
                             for (int i = 0; i < commentList.size(); i++) {
                                 databaseReference.child("Comments").child(commentList.get(i).getNo() + "").setValue(null);
-
-                                System.out.println(commentList.get(i).getNo() +" 삭제");
                             }
                         }
                         databaseReference.child("Feeds").child(dto.getNo()+"").setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -262,7 +256,6 @@ public class DetailActivity extends AppCompatActivity {
                                 finish();
                             }
                         });
-
                     }
                 });
                 builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -271,9 +264,7 @@ public class DetailActivity extends AppCompatActivity {
                         Toast.makeText(DetailActivity.this, "취소되었습니다.",Toast.LENGTH_SHORT).show();
                     }
                 });
-
                 builder.create().show();
-
                 return true;
         }
 

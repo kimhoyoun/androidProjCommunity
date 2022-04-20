@@ -41,7 +41,6 @@ public class FeedFragment extends Fragment {
     FirebaseDatabase database;
     DatabaseReference databaseReference;
 
-
     public FeedFragment(){
 
     }

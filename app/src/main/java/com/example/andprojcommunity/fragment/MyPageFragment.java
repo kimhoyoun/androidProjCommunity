@@ -90,7 +90,6 @@ public class MyPageFragment extends Fragment{
                         }
                         feedAdapter.notifyDataSetChanged();
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });

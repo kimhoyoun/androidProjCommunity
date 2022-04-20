@@ -27,22 +27,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         itemList =list;
     }
 
-    @NonNull
     @Override
     public FeedViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         View view = inflater.inflate(R.layout.feeditem_list,parent,false);
-
         FeedViewHolder viewHolder = new FeedViewHolder(context, view, itemList);
-
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull FeedViewHolder holder, int position) {
-
         if(getItemCount()!= 0) {
             FeedDTO dto = itemList.get(position);
             holder.title.setText(dto.getTitle());
@@ -55,7 +50,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             }
         }
     }
-
     @Override
     public int getItemCount() {
         if(itemList!= null) {
@@ -86,7 +80,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                     int pos = getAdapterPosition();
                     if(pos != RecyclerView.NO_POSITION){
 
-                        Intent intent = new Intent(context, DetailActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Intent intent = new Intent(context, DetailActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.putExtra("dto",itemList.get(pos));
                         context.startActivity(intent);
                     }

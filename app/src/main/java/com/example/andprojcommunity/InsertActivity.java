@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -97,6 +98,7 @@ public class InsertActivity extends AppCompatActivity {
     FirebaseStorage storage = FirebaseStorage.getInstance();
 
     RadioGroup radioGroup;
+    RadioButton radioExercise;
 
     RecyclerView photoView;
     PhotoAdapter adapter;
@@ -130,6 +132,7 @@ public class InsertActivity extends AppCompatActivity {
         newMainText = findViewById(R.id.newMainText);
         btnImgAdd = findViewById(R.id.btnImgAdd);
         radioGroup = findViewById(R.id.radioGroup);
+        radioExercise = findViewById(R.id.radioExercise);
         photoNum = findViewById(R.id.photoNum);
 
 
@@ -147,14 +150,15 @@ public class InsertActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent.getSerializableExtra("dto")!=null){
             dto = (FeedDTO) intent.getSerializableExtra("dto");
-            System.out.println(dto);
             getSupportActionBar().setTitle("내 글 수정");
             newTitle.setText(dto.getTitle());
             newMainText.setText(dto.getMainText());
-            photoNum.setText(dto.getImageList().size()+"/4");
+            if(dto.getFeedType() == 2){
+                radioExercise.setChecked(true);
+            }
 
             if(dto.getImageList()!= null){
-
+                photoNum.setText(dto.getImageList().size()+"/4");
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageReference = storage.getReference().child(dto.getUserID());
                 if(storageReference == null){
@@ -300,7 +304,8 @@ public class InsertActivity extends AppCompatActivity {
                           for (int i = num; i < photoUriList.size(); i++) {
                               String filename = System.currentTimeMillis() + "";
                               newImgList.add(filename);
-
+                                final int index;
+                                index = i;
                               // 스토리지 저장소경로 수정
                               StorageReference storageRef = storage.getReference().child(user.getIdToken() + "/" + filename);
                               UploadTask uploadTask;
@@ -318,22 +323,26 @@ public class InsertActivity extends AppCompatActivity {
                               }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                   @Override
                                   public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
                                       System.out.println("업로드 성공");
-                                      progressBarLayout.setVisibility(View.INVISIBLE);
+
                                       dto.setImageList(newImgList);
                                       dto.setTitle(newTitle.getText().toString());
                                       dto.setMainText(newMainText.getText().toString());
 
-                                      databaseReference.child("Feeds").child(dto.getNo()+"").setValue(dto).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                          @Override
-                                          public void onSuccess(Void unused) {
-                                              Toast.makeText(InsertActivity.this, "수정됨",Toast.LENGTH_SHORT).show();
-                                              Intent intent = new Intent(InsertActivity.this, DetailActivity.class);
-                                              intent.putExtra("dto", dto);
-                                              startActivity(intent);
-                                              finish();
-                                          }
-                                      });
+                                      if(index == photoUriList.size()-1) {
+                                          databaseReference.child("Feeds").child(dto.getNo() + "").setValue(dto).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                              @Override
+                                              public void onSuccess(Void unused) {
+                                                  progressBarLayout.setVisibility(View.INVISIBLE);
+                                                  Toast.makeText(InsertActivity.this, "수정됨", Toast.LENGTH_SHORT).show();
+                                                  Intent intent = new Intent(InsertActivity.this, DetailActivity.class);
+                                                  intent.putExtra("dto", dto);
+                                                  startActivity(intent);
+                                                  finish();
+                                              }
+                                          });
+                                      }
                                   }
                               }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                                   @Override
@@ -359,7 +368,6 @@ public class InsertActivity extends AppCompatActivity {
                               }
                           });
                       }
-
 
                    }else {
 
@@ -405,56 +413,49 @@ public class InsertActivity extends AppCompatActivity {
                                System.out.println("실패");
                            }else {
                                UserAccount user = MainActivity.getUserInstance();
-
                                if (adapter != null && adapter.getItemCount() != 0) {
                                    filenameList = new ArrayList<>();
                                    for (int i = 0; i < photoUriList.size(); i++) {
-
+                                        final int index;
+                                        index = i;
                                        String filename = System.currentTimeMillis() + "";
                                        filenameList.add(filename);
-
-                                       // 스토리지 저장소경로 수정
-                                       StorageReference storageRef = storage.getReferenceFromUrl("gs://androidproj-ab6fe.appspot.com").child(user.getIdToken() + "/" + filename);
+                                       StorageReference storageRef =
+                                               storage.getReference().child(user.getIdToken() + "/" + filename);
                                        UploadTask uploadTask;
-
                                        Uri file = photoUriList.get(i);
-
                                        uploadTask = storageRef.putFile(file);
-
                                        uploadTask.addOnFailureListener(new OnFailureListener() {
                                            @Override
                                            public void onFailure(@NonNull Exception e) {
-                                               System.out.println("업로드 실패");
+                                               Log.e("Error","업로드 실패");
                                                e.printStackTrace();
                                            }
                                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                            @Override
                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                               progressBarLayout.setVisibility(View.INVISIBLE);
-                                               System.out.println("업로드 성공");
-
-                                               long seq = (Long) task.getResult().getValue();
-
-                                               RadioButton rb = (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId());
-                                               int feedType = ((rb.getText().toString()).equals("운동") ? 2 : 1);
-
-                                               FeedDTO feed = new FeedDTO((int) seq, user.getIdToken(), user.getName(), newTitle.getText().toString(), newMainText.getText().toString()
-                                                       , feedType, currentTime(), filenameList);
-
-                                               databaseReference.child("Feeds").child("Sequence").setValue(seq + 1);
-                                               databaseReference.child("Feeds").child(seq + "").setValue(feed).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                   @Override
-                                                   public void onSuccess(Void unused) {
-                                                       Toast.makeText(InsertActivity.this, "입력됨", Toast.LENGTH_SHORT).show();
-                                                       finish();
-                                                   }
-                                               });
-
+                                               Log.i("Result","업로드 성공");
+                                               if(index == photoUriList.size()-1) {
+                                                   long seq = (Long) task.getResult().getValue();
+                                                   RadioButton rb = (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId());
+                                                   int feedType = ((rb.getText().toString()).equals("운동") ? 2 : 1);
+                                                   FeedDTO feed = new FeedDTO((int) seq, user.getIdToken(), user.getName()
+                                                           , newTitle.getText().toString(), newMainText.getText().toString()
+                                                           , feedType, currentTime(), filenameList);
+                                                   databaseReference.child("Feeds").child("Sequence").setValue(seq + 1);
+                                                   databaseReference.child("Feeds").child(seq + "").setValue(feed).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                       @Override
+                                                       public void onSuccess(Void unused) {
+                                                           progressBarLayout.setVisibility(View.INVISIBLE);
+                                                           Toast.makeText(InsertActivity.this, "입력됨", Toast.LENGTH_SHORT).show();
+                                                           finish();
+                                                       }
+                                                   });
+                                               }
                                            }
                                        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                                            @Override
                                            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-
                                                progressBarLayout.setVisibility(View.VISIBLE);
                                            }
                                        });
@@ -491,7 +492,6 @@ public class InsertActivity extends AppCompatActivity {
                 Toast.makeText(InsertActivity.this, "취소되었습니다.",Toast.LENGTH_SHORT).show();
             }
         });
-
         builder.create().show();
     }
     public String currentTime(){
